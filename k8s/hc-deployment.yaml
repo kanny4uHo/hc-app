@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hc-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ryzhkov-hc-app
+  template:
+    metadata:
+      labels:
+        app: ryzhkov-hc-app
+    spec:
+      containers:
+        - name: hc-app
+          image: kappy4uno/hc-app:v0.0.2
+          ports:
+            - containerPort: 8000
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          readinessProbe:
+            httpGet:
+              port: 8000
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          startupProbe:
+            httpGet:
+              port: 8000
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+            failureThreshold: 30
