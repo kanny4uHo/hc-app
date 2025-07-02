@@ -1,48 +1,94 @@
 package main
 
 import (
-	"encoding/json"
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+	"gopkg.in/yaml.v3"
+	"healthcheckProject/internal/config"
+	"healthcheckProject/internal/controller"
+	"healthcheckProject/internal/repository"
+	"healthcheckProject/internal/service"
 )
 
 var started = time.Now()
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", healthHandler)
+	file, err := os.ReadFile("/etc/userapp/config.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	appConfig := config.Config{}
+	err = yaml.Unmarshal(file, &appConfig)
+
+	if err != nil {
+		log.Fatalf("failed to unmarshal config.yaml: %s", err)
+	}
+
+	databaseString := fmt.Sprintf(
+		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
+		appConfig.Database.Username,
+		appConfig.Database.Password,
+		appConfig.Database.Host,
+		appConfig.Database.Port,
+		appConfig.Database.DBName,
+	)
+
+	router := gin.Default()
+
+	db, err := sql.Open("postgres", databaseString)
+	if err != nil {
+		log.Fatalf("failed to connect to userdb: %s", err)
+	}
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("failed to ping userdb: %s", err)
+	}
+
+	userController := controller.CreateUserController(
+		service.NewUserService(repository.NewPgRepo(db)),
+	)
+
+	userGroup := router.Group("/user")
+
+	userGroup.POST("", userController.CreateUser)
+	userGroup.GET("/:user_id", userController.GetUser)
+	userGroup.DELETE("/:user_id", userController.DeleteUser)
+	userGroup.PUT("/:user_id", userController.UpdateUser)
+
+	router.GET("/health", healthHandler)
 
 	fmt.Println("Listening on :8000")
-	err := http.ListenAndServe("0.0.0.0:8000", mux)
+	err = router.Run(":8000")
+
 	fmt.Println("Shutting down")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+
 }
 
-func healthHandler(w http.ResponseWriter, _ *http.Request) {
-	if time.Since(started).Seconds() < 10 {
-		w.WriteHeader(http.StatusServiceUnavailable)
-		w.Write([]byte("Service unavailable"))
+func healthHandler(ctx *gin.Context) {
+	if time.Since(started).Seconds() < 5 {
+		ctx.JSON(http.StatusServiceUnavailable, gin.H{
+			"message": "Service is unavailable",
+		})
 
 		return
 	}
 
-	marshal, err := json.Marshal(HealthResponse{
+	ctx.JSON(http.StatusOK, HealthResponse{
 		Status: "OK",
 		Host:   os.Getenv("HOSTNAME"),
 	})
-	if err != nil {
-		fmt.Println(err.Error())
-
-		return
-	}
-	_, err = w.Write(marshal)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 }
 
 type HealthResponse struct {
