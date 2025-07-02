@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: userapp
-          image: kappy4uno/userapp:v0.0.4
+          image: kappy4uno/userapp:v0.0.5
           ports:
             - containerPort: {{ .Values.userapp.port }}
           volumeMounts:

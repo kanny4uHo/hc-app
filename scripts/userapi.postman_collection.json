@@ -7,21 +7,13 @@
 	},
 	"item": [
 		{
-			"name": "get user",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
 			"name": "create user",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"login\": \"nikita\",\n    \"password\": \"testpassword\",\n    \"email\": \"nikita.tester@bk.ru\",\n    \"first_name\": \"Никита\",\n    \"last_name\": \"Рыжков\"\n}",
+					"raw": "{\n    \"login\": \"niki\",\n    \"password\": \"testpassword\",\n    \"email\": \"nikita.tester@mail.ru\",\n    \"first_name\": \"Nikita\",\n    \"last_name\": \"Ryzhkov\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -29,40 +21,16 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8000/user",
+					"raw": "http://arch.homework/otusapp/nryzhkov/user",
 					"protocol": "http",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"arch",
+						"homework"
 					],
-					"port": "8000",
 					"path": [
+						"otusapp",
+						"nryzhkov",
 						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "delete user",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://127.0.0.1:8000/user/1",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "8000",
-					"path": [
-						"user",
-						"1"
 					]
 				}
 			},
@@ -75,7 +43,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"updated@mail.ru\",\n    \"first_name\": \"НеНикита\",\n    \"last_name\": \"НеРыжков\"\n}",
+					"raw": "{\n    \"email\": \"updated@mail.ru\",\n    \"first_name\": \"NotNikita\",\n    \"last_name\": \"NotRyzhkov\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -83,18 +51,61 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8000/user/1",
+					"raw": "http://arch.homework/otusapp/nryzhkov/user/5",
 					"protocol": "http",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"arch",
+						"homework"
 					],
-					"port": "8000",
 					"path": [
+						"otusapp",
+						"nryzhkov",
 						"user",
-						"1"
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://arch.homework/otusapp/nryzhkov/user/5",
+					"protocol": "http",
+					"host": [
+						"arch",
+						"homework"
+					],
+					"path": [
+						"otusapp",
+						"nryzhkov",
+						"user",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete user",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://arch.homework/otusapp/nryzhkov/user/5",
+					"protocol": "http",
+					"host": [
+						"arch",
+						"homework"
+					],
+					"path": [
+						"otusapp",
+						"nryzhkov",
+						"user",
+						"5"
 					]
 				}
 			},

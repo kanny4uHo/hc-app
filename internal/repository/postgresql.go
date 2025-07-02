@@ -14,8 +14,8 @@ import (
 )
 
 var selectByIDQuery = "SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE id = $1 LIMIT 1"
-var selectByEmailQuery = "SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE username = $1 LIMIT 1"
-var selectByLoginQuery = "SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE email = $1 LIMIT 1"
+var selectByEmailQuery = "SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE email = $1 LIMIT 1"
+var selectByLoginQuery = "SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE username = $1 LIMIT 1"
 
 func NewPgRepo(db *sql.DB) PgUserRepository {
 	return PgUserRepository{

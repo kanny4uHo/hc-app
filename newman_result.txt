@@ -1,0 +1,38 @@
+➜  healthcheckProject git:(main) ✗ newman run scripts/userapi.postman_collection.json
+(node:88278) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+userapi
+
+→ create user
+  POST http://arch.homework/otusapp/nryzhkov/user [201 Created, 250B, 76ms]
+
+→ update user
+  PUT http://arch.homework/otusapp/nryzhkov/user/5 [404 Not Found, 179B, 5ms]
+
+→ get user
+  GET http://arch.homework/otusapp/nryzhkov/user/5 [404 Not Found, 179B, 28ms]
+
+→ delete user
+  DELETE http://arch.homework/otusapp/nryzhkov/user/5 [404 Not Found, 179B, 4ms]
+
+┌─────────────────────────┬──────────────────┬──────────────────┐
+│                         │         executed │           failed │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              iterations │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│                requests │                4 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│            test-scripts │                0 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│      prerequest-scripts │                0 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              assertions │                0 │                0 │
+├─────────────────────────┴──────────────────┴──────────────────┤
+│ total run duration: 147ms                                     │
+├───────────────────────────────────────────────────────────────┤
+│ total data received: 173B (approx)                            │
+├───────────────────────────────────────────────────────────────┤
+│ average response time: 28ms [min: 4ms, max: 76ms, s.d.: 29ms] │
+└───────────────────────────────────────────────────────────────┘
