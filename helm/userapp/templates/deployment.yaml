@@ -14,12 +14,15 @@ spec:
     spec:
       containers:
         - name: userapp
-          image: kappy4uno/userapp:v0.0.2
+          image: kappy4uno/userapp:v0.0.4
           ports:
             - containerPort: {{ .Values.userapp.port }}
           volumeMounts:
             - mountPath: /etc/userapp
               name: userappconfig
+              readOnly: true
+            - mountPath: /etc/pgsecret
+              name: pgpassconfig
               readOnly: true
           livenessProbe:
             httpGet:
@@ -44,3 +47,6 @@ spec:
         - name: userappconfig
           configMap:
             name: userapp-config
+        - name: pgpassconfig
+          secret:
+            secretName: pguser-postgresql

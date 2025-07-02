@@ -24,40 +24,21 @@ func main() {
 		log.Fatalf("failed to unmarshal config.yaml: %s", err)
 	}
 
-	postgresDatabaseString := fmt.Sprintf(
-		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
-		appConfig.Database.Username,
-		appConfig.Database.Password,
-		appConfig.Database.Host,
-		appConfig.Database.Port,
-		"postgres",
-	)
-
-	db, err := sql.Open("postgres", postgresDatabaseString)
+	pwdBytes, err := os.ReadFile("/etc/pgsecret/postgres-password")
 	if err != nil {
-		log.Fatalf("failed to connect to postgres database: %s", err)
-	}
-	defer db.Close()
-	err = db.Ping()
-	if err != nil {
-		log.Fatalf("failed to ping postgres database: %s", err)
-	}
-
-	_, err = db.Exec("CREATE DATABASE " + appConfig.Database.DBName)
-	if err != nil {
-		log.Fatalf("failed to create database: %s", err)
+		log.Fatal("failed to read postgres-password from /etc/pgsecret/postgres-password")
 	}
 
 	databaseString := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
 		appConfig.Database.Username,
-		appConfig.Database.Password,
+		string(pwdBytes),
 		appConfig.Database.Host,
 		appConfig.Database.Port,
 		appConfig.Database.DBName,
 	)
 
-	db, err = sql.Open("postgres", databaseString)
+	db, err := sql.Open("postgres", databaseString)
 	if err != nil {
 		log.Fatalf("failed to connect to userdb: %s", err)
 	}
@@ -77,16 +58,16 @@ func main() {
 )`)
 
 	if err != nil {
-		log.Fatalf("failed to create table 'users': %s", err)
+		log.Printf("failed to create table 'users': %s", err)
 	}
 
 	_, err = db.Exec(`CREATE UNIQUE INDEX users_username_idx ON users(username)`)
 	if err != nil {
-		log.Fatalf("failed to create username index for table 'users': %s", err)
+		log.Printf("failed to create username index for table 'users': %s", err)
 	}
 
 	_, err = db.Exec(`CREATE UNIQUE INDEX users_email_idx ON users(email)`)
 	if err != nil {
-		log.Fatalf("failed to create email index for table 'users': %s", err)
+		log.Printf("failed to create email index for table 'users': %s", err)
 	}
 }

@@ -32,10 +32,15 @@ func main() {
 		log.Fatalf("failed to unmarshal config.yaml: %s", err)
 	}
 
+	pwdBytes, err := os.ReadFile("/etc/pgsecret/postgres-password")
+	if err != nil {
+		log.Fatal("failed to read postgres-password from /etc/pgsecret/postgres-password")
+	}
+
 	databaseString := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
 		appConfig.Database.Username,
-		appConfig.Database.Password,
+		pwdBytes,
 		appConfig.Database.Host,
 		appConfig.Database.Port,
 		appConfig.Database.DBName,

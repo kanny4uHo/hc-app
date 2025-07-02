@@ -1,3 +1,4 @@
 healthcheckProject
 /scripts/db_init/db_init
 /.idea
+/helm/userapp/charts/postgresql-16.7.14.tgz

@@ -16,11 +16,16 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: userapp-initdb
-          image: kappy4uno/initdb:v0.0.3
+          image: kappy4uno/initdb:v0.0.5
           volumeMounts:
             - mountPath: /etc/initdb
               name: initdb-config
+            - mountPath: /etc/pgsecret
+              name: pg-secret
       volumes:
         - name: initdb-config
           configMap:
             name: userapp-config
+        - name: pg-secret
+          secret:
+            secretName: pguser-postgresql
