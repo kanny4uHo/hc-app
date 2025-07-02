@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: userapp-service
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.userapp.port }}
+      targetPort: {{ .Values.userapp.port }}
+      protocol: TCP
+  selector:
+    app: ryzhkov-userapp

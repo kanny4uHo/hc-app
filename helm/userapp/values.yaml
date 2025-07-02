@@ -1,0 +1,8 @@
+replicaCount: 1
+
+userapp:
+  port: 8000
+  db:
+    user: "postgres"
+    password: "userapp_password"
+    name: "userapp"

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: userapp-config
+data:
+  config.yaml: |
+    database:
+      username: {{ .Values.userapp.db.user }}
+      password: {{ .Values.userapp.db.password }}
+      host: pguser-postgresql-primary.default.svc.cluster.local
+      port: 5432
+      db_name: {{ .Values.userapp.db.name }}
+    server:
+      port: {{ .Values.userapp.port }}
+
+

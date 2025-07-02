@@ -1,0 +1,8 @@
+database:
+  host: 127.0.0.1
+  port: 5432
+  username: postgres
+  password: userapp_password
+  db_name: userapp
+server:
+  port: 8000

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userapp-deployment
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: ryzhkov-userapp
+  template:
+    metadata:
+      labels:
+        app: ryzhkov-userapp
+    spec:
+      containers:
+        - name: userapp
+          image: kappy4uno/userapp:v0.0.2
+          ports:
+            - containerPort: {{ .Values.userapp.port }}
+          volumeMounts:
+            - mountPath: /etc/userapp
+              name: userappconfig
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.userapp.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          readinessProbe:
+            httpGet:
+              port: {{ .Values.userapp.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          startupProbe:
+            httpGet:
+              port: {{ .Values.userapp.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+            failureThreshold: 30
+      volumes:
+        - name: userappconfig
+          configMap:
+            name: userapp-config

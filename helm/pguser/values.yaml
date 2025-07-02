@@ -1,0 +1,10 @@
+architecture: replication
+readReplicas:
+  replicaCount: 1
+passwordUpdateJob:
+  enabled: true
+auth:
+  user: "userapp"
+  password: "userapp_password"
+  postgresPassword: "postgres_password"
+  replicationPassword: "replica_password"
