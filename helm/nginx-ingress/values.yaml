@@ -1,0 +1,11 @@
+controller:
+  metrics:
+    enabled: true
+    service:
+      annotations:
+        nikita.ru/scrape_every_30s: "true"
+        prometheus.io/port: "10254"
+  podLabels:
+    app: my-nginx-ingress
+
+

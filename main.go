@@ -10,9 +10,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/yaml.v3"
 	"healthcheckProject/internal/config"
 	"healthcheckProject/internal/controller"
+	"healthcheckProject/internal/metrics"
 	"healthcheckProject/internal/repository"
 	"healthcheckProject/internal/service"
 )
@@ -58,6 +62,21 @@ func main() {
 		log.Fatalf("failed to ping userdb: %s", err)
 	}
 
+	httpRequestMetric := promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "http_requests_total",
+		Help: "The total number of processed http requests",
+	}, []string{"status", "path", "method"})
+
+	httpRequestLatencyMetric := promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "http_request_latency_seconds",
+		Help: "The latency of http requests in seconds",
+	}, []string{"status", "path", "method"})
+
+	router.Use(metrics.HttpMiddleware{
+		RequestMetrics: httpRequestMetric,
+		LatencyMetrics: httpRequestLatencyMetric,
+	}.Handler)
+
 	userController := controller.CreateUserController(
 		service.NewUserService(repository.NewPgRepo(db)),
 	)
@@ -70,6 +89,8 @@ func main() {
 	userGroup.PUT("/:user_id", userController.UpdateUser)
 
 	router.GET("/health", healthHandler)
+
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	fmt.Println("Listening on :8000")
 	err = router.Run(":8000")

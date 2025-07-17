@@ -18,3 +18,4 @@ spec:
                 port:
                   number: {{ .Values.userapp.port }}
             pathType: ImplementationSpecific
+

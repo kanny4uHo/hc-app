@@ -1,10 +1,16 @@
 architecture: replication
 readReplicas:
   replicaCount: 1
-passwordUpdateJob:
-  enabled: true
+#passwordUpdateJob:
+#  enabled: true
 auth:
   user: "userapp"
   password: "userapp_password"
   postgresPassword: "postgres_password"
   replicationPassword: "replica_password"
+metrics:
+  enabled: true
+  service:
+    annotations:
+      nikita.ru/scrape_every_30s: "true"
+      prometheus.io/port: "9187"

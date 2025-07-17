@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 3
 
 userapp:
   port: 8000
@@ -6,3 +6,16 @@ userapp:
     user: "postgres"
     password: "userapp_password"
     name: "userapp"
+
+kubernetes-ingress:
+  prometheus:
+    create: true
+#kubernetes-ingress:
+#  controller:
+#    metrics:
+#      enabled: true
+#      serviceMonitor:
+#        enabled: true
+#        scrapeInterval: 10s
+#        additionalLabels:
+#          release: myprometheus

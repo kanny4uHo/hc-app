@@ -9,12 +9,16 @@ spec:
       app: ryzhkov-userapp
   template:
     metadata:
+      annotations:
+        nikita.ru/scrape_every_30s: "true"
+        prometheus.io/port: "8000"
       labels:
         app: ryzhkov-userapp
     spec:
       containers:
         - name: userapp
-          image: kappy4uno/userapp:v0.0.5
+          image: kappy4uno/userapp:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: {{ .Values.userapp.port }}
           volumeMounts:
