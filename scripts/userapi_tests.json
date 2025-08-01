@@ -1,0 +1,680 @@
+{
+	"info": {
+		"_postman_id": "32912d79-1505-46cd-a7ec-1c786acfe1cb",
+		"name": "userapi tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "20216453"
+	},
+	"item": [
+		{
+			"name": "create user 1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set('accessToken', '');",
+							"",
+							"function generateRandomString(length) {",
+							"  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';",
+							"  let result = '';",
+							"  const charactersLength = characters.length;",
+							"  for (let i = 0; i < length; i++) {",
+							"    result += characters.charAt(Math.floor(Math.random() * charactersLength));",
+							"  }",
+							"  return result;",
+							"}",
+							"",
+							"let timestamp = Date.now().toString().substr(8);",
+							"",
+							"pm.request.body.update({",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"        \"login\": \"n\" + timestamp + generateRandomString(5),",
+							"        \"email\": timestamp + generateRandomString(5) + \"@mail.ru\",",
+							"        \"password\": \"12345678\",",
+							"        \"first_name\": \"Nikita\",",
+							"        \"last_name\": \"Ryzhkov\"",
+							"    }),",
+							"    options: {",
+							"        raw: {",
+							"            language: 'json'",
+							"        }",
+							"    }",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response body contains user ID\", function () {",
+							"    pm.expect(pm.response.json().id).to.not.be.null;",
+							"});",
+							"",
+							"pm.collectionVariables.set('userID', pm.response.json().id);",
+							"pm.collectionVariables.set('userLogin', pm.response.json().login);",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"nikita2\",\n    \"password\": \"testpassword\",\n    \"email\": \"nikita.tester3@mail.ru\",\n    \"first_name\": \"Nikita\",\n    \"last_name\": \"Ryzhkov\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user"
+			},
+			"response": []
+		},
+		{
+			"name": "get user 1 no auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 401\", function () {",
+							"    pm.expect(pm.response.code).to.equal(401);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{userID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "update user 1 no auth",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let timestamp = Date.now()",
+							"",
+							"pm.request.body.update({",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"        \"email\": timestamp + \"upd@mail.ru\",",
+							"        \"first_name\": \"NotNikita\",",
+							"        \"last_name\": \"NotRyzhkov\"",
+							"    }),",
+							"    options: {",
+							"        raw: {",
+							"            language: 'json'",
+							"        }",
+							"    }",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Response status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"updated@mail.ru\",\n    \"first_name\": \"NotNikita\",\n    \"last_name\": \"NotRyzhkov\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{userID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete user 1 no auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 401\", function () {",
+							"    pm.expect(pm.response.code).to.equal(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{userID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "authorize user 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response body contains user ID\", function () {",
+							"    pm.expect(pm.response.json().access_token).to.not.be.null;",
+							"});",
+							"",
+							"pm.collectionVariables.set('accessToken', pm.response.json().access_token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{userLogin}}\",\n    \"password\": \"12345678\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/login"
+			},
+			"response": []
+		},
+		{
+			"name": "update user 1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let timestamp = Date.now()",
+							"",
+							"pm.request.body.update({",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"        \"email\": timestamp + \"upd@mail.ru\",",
+							"        \"first_name\": \"NotNikita\",",
+							"        \"last_name\": \"NotRyzhkov\"",
+							"    }),",
+							"    options: {",
+							"        raw: {",
+							"            language: 'json'",
+							"        }",
+							"    }",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.contain('application/json');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate the presence of required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.all.keys('id', 'login', 'email', 'name');",
+							"    pm.expect(responseData.name).to.be.an('object').that.has.all.keys('first', 'last');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Email is in a valid format\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.email).to.exist;",
+							"    pm.expect(responseData.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/, \"Email format is invalid\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Name contains both first and last as non-empty strings\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.name).to.be.an('object').that.has.all.keys('first', 'last');",
+							"    ",
+							"    pm.expect(responseData.name.first).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"First name should not be empty\");",
+							"    pm.expect(responseData.name.last).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"Last name should not be empty\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"updated@mail.ru\",\n    \"first_name\": \"NotNikita\",\n    \"last_name\": \"NotRyzhkov\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{userID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "get user 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.all.keys('id', 'login', 'email', 'name');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Email is in a valid format\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.email).to.exist.and.to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/, \"Email format is invalid\");",
+							"    // содержит обновленное значение",
+							"    pm.expect(responseData.email).to.contain(\"upd@mail.ru\")",
+							"});",
+							"",
+							"",
+							"pm.test(\"Name contains both first and last fields as non-empty strings\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.name).to.exist.and.to.be.an('object').that.includes.all.keys('first', 'last');",
+							"    ",
+							"    pm.expect(responseData.name.first).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"First name should not be empty\");",
+							"    pm.expect(responseData.name.last).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"Last name should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoiMjAyNS0wOC0wMVQxMTo1MTowMS44Mjc2MTg1NDRaIiwibG9naW4iOiJuMDcwNjJRT0dDcSIsInVzZXJfaWQiOjU0MDg4fQ.lKVoZlVMmj-ZVh0FLE63foBJx2ZsDw6Yuuk5daj7-TE",
+						"type": "text"
+					}
+				],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{userID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "create user 2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set('accessToken', '');",
+							"",
+							"function generateRandomString(length) {",
+							"  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';",
+							"  let result = '';",
+							"  const charactersLength = characters.length;",
+							"  for (let i = 0; i < length; i++) {",
+							"    result += characters.charAt(Math.floor(Math.random() * charactersLength));",
+							"  }",
+							"  return result;",
+							"}",
+							"",
+							"let timestamp = Date.now().toString().substr(8);",
+							"",
+							"pm.request.body.update({",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"        \"login\": \"n\" + timestamp + generateRandomString(5),",
+							"        \"email\": timestamp + generateRandomString(5) + \"@mail.ru\",",
+							"        \"password\": \"12345678\",",
+							"        \"first_name\": \"Nikita\",",
+							"        \"last_name\": \"Ryzhkov\"",
+							"    }),",
+							"    options: {",
+							"        raw: {",
+							"            language: 'json'",
+							"        }",
+							"    }",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response body contains user ID\", function () {",
+							"    pm.expect(pm.response.json().id).to.not.be.null;",
+							"});",
+							"",
+							"",
+							"pm.collectionVariables.set('prevUserID', pm.collectionVariables.get('userID'));",
+							"pm.collectionVariables.set('userID', pm.response.json().id);",
+							"pm.collectionVariables.set('userLogin', pm.response.json().login);",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"nikita2\",\n    \"password\": \"testpassword\",\n    \"email\": \"nikita.tester3@mail.ru\",\n    \"first_name\": \"Nikita\",\n    \"last_name\": \"Ryzhkov\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user"
+			},
+			"response": []
+		},
+		{
+			"name": "authorize user 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response body contains user ID\", function () {",
+							"    pm.expect(pm.response.json().access_token).to.not.be.null;",
+							"});",
+							"",
+							"pm.collectionVariables.set('accessToken', pm.response.json().access_token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{userLogin}}\",\n    \"password\": \"12345678\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/login"
+			},
+			"response": []
+		},
+		{
+			"name": "get user 1 other user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoiMjAyNS0wOC0wMVQxMTo1MTowMS44Mjc2MTg1NDRaIiwibG9naW4iOiJuMDcwNjJRT0dDcSIsInVzZXJfaWQiOjU0MDg4fQ.lKVoZlVMmj-ZVh0FLE63foBJx2ZsDw6Yuuk5daj7-TE",
+						"type": "text"
+					}
+				],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{prevUserID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "update user 1 other user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let timestamp = Date.now()",
+							"",
+							"pm.request.body.update({",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"        \"email\": timestamp + \"upd@mail.ru\",",
+							"        \"first_name\": \"NotNikita\",",
+							"        \"last_name\": \"NotRyzhkov\"",
+							"    }),",
+							"    options: {",
+							"        raw: {",
+							"            language: 'json'",
+							"        }",
+							"    }",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Response status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"updated@mail.ru\",\n    \"first_name\": \"NotNikita\",\n    \"last_name\": \"NotRyzhkov\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{prevUserID}}"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{accessToken}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework",
+			"type": "string"
+		},
+		{
+			"key": "userID",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "userLogin",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "prevUserID",
+			"value": "0",
+			"type": "default"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		}
+	]
+}
