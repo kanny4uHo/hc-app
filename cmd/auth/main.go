@@ -1,8 +1,7 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
+	"healthcheckProject/internal/repository/httpclient"
 	"log"
 	"net/http"
 	"os"
@@ -24,7 +23,7 @@ import (
 var started = time.Now()
 
 func main() {
-	file, err := os.ReadFile("/etc/userapp/config.yaml")
+	file, err := os.ReadFile("/etc/authapp/config.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,31 +35,9 @@ func main() {
 		log.Fatalf("failed to unmarshal config.yaml: %s", err)
 	}
 
-	pwdBytes, err := os.ReadFile("/etc/pgsecret/postgres-password")
-	if err != nil {
-		log.Fatal("failed to read postgres-password from /etc/pgsecret/postgres-password")
-	}
-
-	databaseString := fmt.Sprintf(
-		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
-		appConfig.Database.Username,
-		pwdBytes,
-		appConfig.Database.Host,
-		appConfig.Database.Port,
-		appConfig.Database.DBName,
-	)
+	jwtTokenSecret := os.Getenv("jwt-token")
 
 	router := gin.Default()
-
-	db, err := sql.Open("postgres", databaseString)
-	if err != nil {
-		log.Fatalf("failed to connect to userdb: %s", err)
-	}
-	defer db.Close()
-	err = db.Ping()
-	if err != nil {
-		log.Fatalf("failed to ping userdb: %s", err)
-	}
 
 	httpRequestMetric := promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "http_requests_total",
@@ -77,27 +54,36 @@ func main() {
 		LatencyMetrics: httpRequestLatencyMetric,
 	}.Handler)
 
-	userController := controller.CreateUserController(
-		service.NewUserService(repository.NewPgRepo(db)),
-	)
+	credRepo := repository.NewUserServiceRepo(
+		httpclient.NewUserClient(
+			appConfig.UserService.URL,
+			&http.Client{Timeout: time.Second},
+		))
 
-	userGroup := router.Group("/user")
+	authService := service.NewAuthService(credRepo, []byte(jwtTokenSecret))
+	authController := controller.NewAuthController(authService)
 
-	userGroup.POST("", userController.CreateUser)
-	userGroup.GET("/:user_id", userController.GetUser)
-	userGroup.DELETE("/:user_id", userController.DeleteUser)
-	userGroup.PUT("/:user_id", userController.UpdateUser)
+	apiRouter := router.Group("/api/v1")
+	{
+		apiRouter.POST("/login", authController.Login)
+	}
+
+	internalApiRouter := router.Group("/internal/api/v1")
+	{
+		internalApiRouter.POST("/register", authController.Register)
+		internalApiRouter.GET("/check", authController.AuthCheck)
+	}
 
 	router.GET("/health", healthHandler)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
-	fmt.Println("Listening on :8000")
+	log.Println("Listening on :8000")
 	err = router.Run(":8000")
 
-	fmt.Println("Shutting down")
+	log.Println("Shutting down")
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 	}
 
 }

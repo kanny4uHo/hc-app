@@ -5,49 +5,33 @@ import (
 	"fmt"
 
 	"healthcheckProject/internal/entity"
+	"healthcheckProject/internal/utils"
 )
 
 type UserService struct {
 	userRepo UserRepo
+	authGate AuthGateway
 }
 
-func NewUserService(repo UserRepo) UserService {
-	return UserService{
+func NewUserService(repo UserRepo, authGate AuthGateway) *UserService {
+	return &UserService{
 		userRepo: repo,
+		authGate: authGate,
 	}
 }
 
-func (s UserService) CreateUser(ctx context.Context, args entity.AddUserArgs) (entity.User, error) {
+func (s *UserService) CreateUser(ctx context.Context, args entity.AddUserArgs) (entity.User, error) {
 	var resultUser entity.User
 
 	err := s.userRepo.WithinTransaction(ctx, func(ctx context.Context) error {
-		userByLogin, err := s.userRepo.GetUserByLogin(ctx, args.Login)
+		var err error
+
+		registerUser, err := s.authGate.RegisterUser(ctx, args)
 		if err != nil {
-			return fmt.Errorf("failed to get user by login: %w", err)
+			return fmt.Errorf("failed to register user in authGate: %w", err)
 		}
 
-		if !userByLogin.IsEmpty() {
-			return InvalidArgumentError{
-				Field:  "login",
-				Value:  args.Login,
-				Reason: "user already exists",
-			}
-		}
-
-		userByEmail, err := s.userRepo.GetUserByEmail(ctx, args.Meta.Email)
-		if err != nil {
-			return fmt.Errorf("failed to get user by login: %w", err)
-		}
-
-		if !userByEmail.IsEmpty() {
-			return InvalidArgumentError{
-				Field:  "email",
-				Value:  args.Meta.Email,
-				Reason: "user already exists",
-			}
-		}
-
-		resultUser, err = s.userRepo.AddUser(ctx, args)
+		resultUser, err = s.userRepo.AddUser(ctx, args, registerUser.PasswordHash)
 		if err != nil {
 			return fmt.Errorf("failed to add user: %w", err)
 		}
@@ -62,7 +46,12 @@ func (s UserService) CreateUser(ctx context.Context, args entity.AddUserArgs) (e
 	return resultUser, nil
 }
 
-func (s UserService) DeleteUser(ctx context.Context, id int64) (entity.User, error) {
+func (s *UserService) DeleteUser(ctx context.Context, id int64) (entity.User, error) {
+	user := utils.GetUser(ctx)
+	if user.ID != id {
+		return entity.User{}, fmt.Errorf("%w: user %d is not found (wrong auth)", ErrUserNotFound, id)
+	}
+
 	var resultUser entity.User
 
 	err := s.userRepo.WithinTransaction(ctx, func(ctx context.Context) error {
@@ -97,7 +86,12 @@ type UpdateUserArgs struct {
 	Email     string
 }
 
-func (s UserService) UpdateUser(ctx context.Context, userID int64, args UpdateUserArgs) (entity.User, error) {
+func (s *UserService) UpdateUser(ctx context.Context, userID int64, args UpdateUserArgs) (entity.User, error) {
+	user := utils.GetUser(ctx)
+	if user.ID != userID {
+		return entity.User{}, fmt.Errorf("%w: user %d is not found (wrong auth)", ErrUserNotFound, userID)
+	}
+
 	var resultUser entity.User
 
 	err := s.userRepo.WithinTransaction(ctx, func(ctx context.Context) error {
@@ -130,7 +124,12 @@ func (s UserService) UpdateUser(ctx context.Context, userID int64, args UpdateUs
 	return resultUser, nil
 }
 
-func (s UserService) GetUser(ctx context.Context, id int64) (entity.User, error) {
+func (s *UserService) GetUser(ctx context.Context, id int64) (entity.User, error) {
+	user := utils.GetUser(ctx)
+	if user.ID != id {
+		return entity.User{}, fmt.Errorf("%w: user %d is not found (wrong auth)", ErrUserNotFound, id)
+	}
+
 	userByID, err := s.userRepo.GetUserByID(ctx, id)
 
 	if err != nil {
@@ -142,4 +141,18 @@ func (s UserService) GetUser(ctx context.Context, id int64) (entity.User, error)
 	}
 
 	return userByID, nil
+}
+
+func (s *UserService) InternalGetUserByLogin(ctx context.Context, login string) (entity.User, error) {
+	userByLogin, err := s.userRepo.GetUserByLogin(ctx, login)
+
+	if err != nil {
+		return entity.User{}, fmt.Errorf("failed get user by login: %w", err)
+	}
+
+	if userByLogin.IsEmpty() {
+		return entity.User{}, fmt.Errorf("%w: user %s is not found", ErrUserNotFound, login)
+	}
+
+	return userByLogin, nil
 }

@@ -11,10 +11,10 @@ import (
 )
 
 type UserController struct {
-	userService service.UserService
+	userService *service.UserService
 }
 
-func CreateUserController(userService service.UserService) UserController {
+func CreateUserController(userService *service.UserService) UserController {
 	return UserController{
 		userService: userService,
 	}
@@ -40,7 +40,13 @@ type UserResponse struct {
 	Name  NameResponse `json:"name"`
 }
 
-func (c UserController) CreateUser(ctx *gin.Context) {
+type InternalUserInfo struct {
+	ID           int    `json:"user_id"`
+	Login        string `json:"username"`
+	PasswordHash string `json:"password_hash"`
+}
+
+func (c *UserController) CreateUser(ctx *gin.Context) {
 	var createUserArgs CreateUserArgs
 
 	err := ctx.ShouldBindJSON(&createUserArgs)
@@ -84,7 +90,7 @@ func (c UserController) CreateUser(ctx *gin.Context) {
 
 }
 
-func (c UserController) GetUser(ctx *gin.Context) {
+func (c *UserController) GetUser(ctx *gin.Context) {
 	userIDParam := ctx.Param("user_id")
 
 	userID, err := strconv.ParseInt(userIDParam, 10, 64)
@@ -117,7 +123,29 @@ func (c UserController) GetUser(ctx *gin.Context) {
 	})
 }
 
-func (c UserController) DeleteUser(ctx *gin.Context) {
+func (c *UserController) InternalGetUserByLogin(ctx *gin.Context) {
+	userLoginParam := ctx.Param("user_login")
+
+	user, err := c.userService.InternalGetUserByLogin(ctx, userLoginParam)
+
+	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "no user found"})
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, InternalUserInfo{
+		ID:           int(user.ID),
+		Login:        user.Login,
+		PasswordHash: user.PasswordHash,
+	})
+}
+
+func (c *UserController) DeleteUser(ctx *gin.Context) {
 	userIDParam := ctx.Param("user_id")
 
 	userID, err := strconv.ParseInt(userIDParam, 10, 64)
@@ -156,7 +184,7 @@ type UpdateUserArgs struct {
 	Email     string `json:"email" binding:"email"`
 }
 
-func (c UserController) UpdateUser(ctx *gin.Context) {
+func (c *UserController) UpdateUser(ctx *gin.Context) {
 	userIDParam := ctx.Param("user_id")
 	userID, err := strconv.ParseInt(userIDParam, 10, 64)
 

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: userapp-deployment
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.userapp.replicaCount }}
   selector:
     matchLabels:
       app: ryzhkov-userapp
@@ -11,16 +11,16 @@ spec:
     metadata:
       annotations:
         nikita.ru/scrape_every_30s: "true"
-        prometheus.io/port: "8000"
+        prometheus.io/port: "{{ .Values.userapp.server.port }}"
       labels:
         app: ryzhkov-userapp
     spec:
       containers:
         - name: userapp
-          image: kappy4uno/userapp:latest
+          image: kappy4uno/user_app:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{ .Values.userapp.port }}
+            - containerPort: {{ .Values.userapp.server.port }}
           volumeMounts:
             - mountPath: /etc/userapp
               name: userappconfig
@@ -30,19 +30,19 @@ spec:
               readOnly: true
           livenessProbe:
             httpGet:
-              port: {{ .Values.userapp.port }}
+              port: {{ .Values.userapp.server.port }}
               path: /health
             initialDelaySeconds: 3
             periodSeconds: 1
           readinessProbe:
             httpGet:
-              port: {{ .Values.userapp.port }}
+              port: {{ .Values.userapp.server.port }}
               path: /health
             initialDelaySeconds: 3
             periodSeconds: 1
           startupProbe:
             httpGet:
-              port: {{ .Values.userapp.port }}
+              port: {{ .Values.userapp.server.port }}
               path: /health
             initialDelaySeconds: 3
             periodSeconds: 1

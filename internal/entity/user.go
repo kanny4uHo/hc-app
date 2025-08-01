@@ -6,9 +6,13 @@ type AddUserArgs struct {
 	Meta     UserMeta
 }
 
+type UserShort struct {
+	ID    int64
+	Login string
+}
+
 type User struct {
-	ID           int64
-	Login        string
+	UserShort
 	PasswordHash string
 	Meta         UserMeta
 }

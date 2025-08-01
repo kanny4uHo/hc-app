@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authapp-config
+data:
+  config.yaml: |
+    server:
+      port: {{ .Values.authapp.server.port }}
+    user_service:
+      url: {{ .Values.authapp.user_service.url}}
+
+

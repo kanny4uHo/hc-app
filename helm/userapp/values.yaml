@@ -1,21 +1,22 @@
-replicaCount: 3
-
 userapp:
-  port: 8000
+  replicaCount: 3
+  server:
+    port: 8000
   db:
     user: "postgres"
     password: "userapp_password"
     name: "userapp"
+  auth_service:
+    url: http://authapp-service.default.svc.cluster.local:8000
+
+authapp:
+  replicaCount: 3
+  server:
+    port: 8000
+  user_service:
+    url: http://userapp-service.default.svc.cluster.local:8000
+  jwt_token: 633TvE7i4SsFZvpNXRnv8q9MDd
 
 kubernetes-ingress:
   prometheus:
     create: true
-#kubernetes-ingress:
-#  controller:
-#    metrics:
-#      enabled: true
-#      serviceMonitor:
-#        enabled: true
-#        scrapeInterval: 10s
-#        additionalLabels:
-#          release: myprometheus

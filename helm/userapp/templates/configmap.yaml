@@ -11,6 +11,8 @@ data:
       port: 5432
       db_name: {{ .Values.userapp.db.name }}
     server:
-      port: {{ .Values.userapp.port }}
+      port: {{ .Values.userapp.server.port }}
+    auth_service:
+      url: {{ .Values.userapp.auth_service.url }}
 
 

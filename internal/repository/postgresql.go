@@ -2,9 +2,7 @@ package repository
 
 import (
 	"context"
-	"crypto/md5"
 	"database/sql"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
@@ -17,8 +15,8 @@ var selectByIDQuery = "SELECT id, username, email, password_hash, first_name, la
 var selectByEmailQuery = "SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE email = $1 LIMIT 1"
 var selectByLoginQuery = "SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE username = $1 LIMIT 1"
 
-func NewPgRepo(db *sql.DB) PgUserRepository {
-	return PgUserRepository{
+func NewPgRepo(db *sql.DB) *PgUserRepository {
+	return &PgUserRepository{
 		sql: db,
 	}
 }
@@ -27,7 +25,9 @@ type PgUserRepository struct {
 	sql *sql.DB
 }
 
-func (p PgUserRepository) WithinTransaction(ctx context.Context, f func(ctx context.Context) error) error {
+var _ service.UserRepo = (*PgUserRepository)(nil)
+
+func (p *PgUserRepository) WithinTransaction(ctx context.Context, f func(ctx context.Context) error) error {
 	tx, err := p.sql.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to start transaction: %w", err)
@@ -47,9 +47,7 @@ func (p PgUserRepository) WithinTransaction(ctx context.Context, f func(ctx cont
 	return nil
 }
 
-func (p PgUserRepository) AddUser(ctx context.Context, user entity.AddUserArgs) (entity.User, error) {
-	passwordHash := md5.Sum([]byte(user.Password))
-
+func (p *PgUserRepository) AddUser(ctx context.Context, user entity.AddUserArgs, passwordHash string) (entity.User, error) {
 	var userID int64
 
 	err := p.sql.QueryRowContext(
@@ -57,7 +55,7 @@ func (p PgUserRepository) AddUser(ctx context.Context, user entity.AddUserArgs) 
 		`INSERT INTO users (username, email, password_hash, first_name, last_name) VALUES ($1, $2, $3, $4, $5) returning id`,
 		user.Login,
 		user.Meta.Email,
-		hex.EncodeToString(passwordHash[:]),
+		passwordHash,
 		user.Meta.Name.First,
 		user.Meta.Name.Last,
 	).Scan(&userID)
@@ -69,19 +67,19 @@ func (p PgUserRepository) AddUser(ctx context.Context, user entity.AddUserArgs) 
 	return p.GetUserByID(ctx, userID)
 }
 
-func (p PgUserRepository) GetUserByID(ctx context.Context, id int64) (entity.User, error) {
+func (p *PgUserRepository) GetUserByID(ctx context.Context, id int64) (entity.User, error) {
 	return p.selectOneUserByQuery(ctx, selectByIDQuery, id)
 }
 
-func (p PgUserRepository) GetUserByLogin(ctx context.Context, login string) (entity.User, error) {
+func (p *PgUserRepository) GetUserByLogin(ctx context.Context, login string) (entity.User, error) {
 	return p.selectOneUserByQuery(ctx, selectByLoginQuery, login)
 }
 
-func (p PgUserRepository) GetUserByEmail(ctx context.Context, email string) (entity.User, error) {
+func (p *PgUserRepository) GetUserByEmail(ctx context.Context, email string) (entity.User, error) {
 	return p.selectOneUserByQuery(ctx, selectByEmailQuery, email)
 }
 
-func (p PgUserRepository) UpdateUser(ctx context.Context, id int64, args service.UpdateUserArgs) error {
+func (p *PgUserRepository) UpdateUser(ctx context.Context, id int64, args service.UpdateUserArgs) error {
 	if args.LastName != "" {
 		_, err := p.sql.ExecContext(ctx, `UPDATE users set last_name = $1 where id = $2`, args.LastName, id)
 		if err != nil {
@@ -106,7 +104,7 @@ func (p PgUserRepository) UpdateUser(ctx context.Context, id int64, args service
 	return nil
 }
 
-func (p PgUserRepository) DeleteUser(ctx context.Context, id int64) error {
+func (p *PgUserRepository) DeleteUser(ctx context.Context, id int64) error {
 	_, err := p.sql.ExecContext(ctx, `DELETE FROM users WHERE id=$1`, id)
 	if err != nil {
 		return fmt.Errorf("failed to exec delete query: %w", err)
@@ -115,7 +113,7 @@ func (p PgUserRepository) DeleteUser(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (p PgUserRepository) selectOneUserByQuery(ctx context.Context, query string, args ...any) (entity.User, error) {
+func (p *PgUserRepository) selectOneUserByQuery(ctx context.Context, query string, args ...any) (entity.User, error) {
 	var id int64
 	var login string
 	var email string
@@ -134,8 +132,10 @@ func (p PgUserRepository) selectOneUserByQuery(ctx context.Context, query string
 	}
 
 	return entity.User{
-		ID:           id,
-		Login:        login,
+		UserShort: entity.UserShort{
+			ID:    id,
+			Login: login,
+		},
 		PasswordHash: passwordHashFromDB,
 		Meta: entity.UserMeta{
 			Name: entity.UserName{

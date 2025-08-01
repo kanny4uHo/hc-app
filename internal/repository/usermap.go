@@ -39,8 +39,10 @@ func (u UserMap) AddUser(_ context.Context, user entity.AddUserArgs) (entity.Use
 	passwordHash := md5.Sum([]byte(user.Password))
 
 	newUser := entity.User{
-		ID:           newUserID,
-		Login:        user.Login,
+		UserShort: entity.UserShort{
+			ID:    newUserID,
+			Login: user.Login,
+		},
 		PasswordHash: hex.EncodeToString(passwordHash[:]),
 		Meta:         user.Meta,
 	}

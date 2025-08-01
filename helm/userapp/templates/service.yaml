@@ -5,8 +5,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: {{ .Values.userapp.port }}
-      targetPort: {{ .Values.userapp.port }}
+    - port: {{ .Values.userapp.server.port }}
+      targetPort: {{ .Values.userapp.server.port }}
       protocol: TCP
   selector:
     app: ryzhkov-userapp

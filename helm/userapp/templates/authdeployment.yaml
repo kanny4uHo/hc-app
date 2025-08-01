@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authapp-deployment
+spec:
+  replicas: {{ .Values.authapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: ryzhkov-authapp
+  template:
+    metadata:
+      annotations:
+        nikita.ru/scrape_every_30s: "true"
+        prometheus.io/port: "8000"
+      labels:
+        app: ryzhkov-authapp
+    spec:
+      containers:
+        - name: authapp
+          image: kappy4uno/auth_app:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: auth-service-secret
+          ports:
+            - containerPort: {{ .Values.authapp.server.port }}
+          volumeMounts:
+            - mountPath: /etc/authapp
+              name: authappconfig
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.authapp.server.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          readinessProbe:
+            httpGet:
+              port: {{ .Values.authapp.server.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          startupProbe:
+            httpGet:
+              port: {{ .Values.authapp.server.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 1
+            failureThreshold: 30
+      volumes:
+        - name: authappconfig
+          configMap:
+            name: authapp-config

@@ -10,4 +10,12 @@ type Config struct {
 	Server struct {
 		Port int `yaml:"port"`
 	} `yaml:"server"`
+
+	UserService struct {
+		URL string `yaml:"url"`
+	} `yaml:"user_service"`
+
+	AuthService struct {
+		URL string `yaml:"url"`
+	} `yaml:"auth_service"`
 }
