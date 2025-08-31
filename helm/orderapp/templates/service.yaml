@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: orderapp-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.orderapp.server.port }}
+      targetPort: {{ .Values.orderapp.server.port }}
+      protocol: TCP
+  selector:
+    app: ryzhkov-orderapp

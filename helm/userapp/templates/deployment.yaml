@@ -33,20 +33,7 @@ spec:
               port: {{ .Values.userapp.server.port }}
               path: /health
             initialDelaySeconds: 3
-            periodSeconds: 1
-          readinessProbe:
-            httpGet:
-              port: {{ .Values.userapp.server.port }}
-              path: /health
-            initialDelaySeconds: 3
-            periodSeconds: 1
-          startupProbe:
-            httpGet:
-              port: {{ .Values.userapp.server.port }}
-              path: /health
-            initialDelaySeconds: 3
-            periodSeconds: 1
-            failureThreshold: 30
+            periodSeconds: 5
       volumes:
         - name: userappconfig
           configMap:

@@ -21,7 +21,7 @@ func RequireUser(ctx *gin.Context) {
 	}
 
 	userIDString := ctx.GetHeader(XUserIDHeader)
-	userID, err := strconv.ParseInt(userIDString, 10, 64)
+	userID, err := strconv.ParseUint(userIDString, 10, 64)
 	if err != nil {
 		log.Printf("invalid user id: %s\n", userIDString)
 		ctx.AbortWithStatus(http.StatusUnauthorized)

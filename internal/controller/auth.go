@@ -45,7 +45,6 @@ func (ac *AuthController) Register(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&registerArgs)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

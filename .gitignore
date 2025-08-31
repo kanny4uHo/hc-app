@@ -3,3 +3,6 @@
 /helm/userapp/charts/postgresql-16.7.14.tgz
 /cmd/user/user_app
 /cmd/auth/auth_app
+/cmd/order/order_app
+/cmd/billing/billing_app
+/cmd/notification/notification_app

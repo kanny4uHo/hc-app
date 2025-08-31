@@ -13,16 +13,16 @@ import (
 )
 
 type UserMap struct {
-	userMap map[int64]entity.User
+	userMap map[uint64]entity.User
 	mutex   *sync.Mutex
-	lastID  *atomic.Int64
+	lastID  *atomic.Uint64
 }
 
 func NewUserMap() UserMap {
 	return UserMap{
-		userMap: make(map[int64]entity.User),
+		userMap: make(map[uint64]entity.User),
 		mutex:   &sync.Mutex{},
-		lastID:  &atomic.Int64{},
+		lastID:  &atomic.Uint64{},
 	}
 }
 
@@ -52,7 +52,7 @@ func (u UserMap) AddUser(_ context.Context, user entity.AddUserArgs) (entity.Use
 	return newUser, nil
 }
 
-func (u UserMap) GetUserByID(_ context.Context, id int64) (entity.User, error) {
+func (u UserMap) GetUserByID(_ context.Context, id uint64) (entity.User, error) {
 	return u.userMap[id], nil
 }
 
@@ -76,7 +76,7 @@ func (u UserMap) GetUserByEmail(_ context.Context, email string) (entity.User, e
 	return entity.User{}, nil
 }
 
-func (u UserMap) UpdateUser(_ context.Context, id int64, args service.UpdateUserArgs) error {
+func (u UserMap) UpdateUser(_ context.Context, id uint64, args service.UpdateUserArgs) error {
 	userToUpdate, ok := u.userMap[id]
 	if !ok {
 		return fmt.Errorf("user %d not found", id)
@@ -99,7 +99,7 @@ func (u UserMap) UpdateUser(_ context.Context, id int64, args service.UpdateUser
 	return nil
 }
 
-func (u UserMap) DeleteUser(_ context.Context, id int64) error {
+func (u UserMap) DeleteUser(_ context.Context, id uint64) error {
 	delete(u.userMap, id)
 	return nil
 }

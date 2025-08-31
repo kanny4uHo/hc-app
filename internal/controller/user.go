@@ -33,16 +33,22 @@ type NameResponse struct {
 	Last  string `json:"last"`
 }
 
+type Wallet struct {
+	Balance int64 `json:"balance"`
+}
+
 type UserResponse struct {
-	ID    int64        `json:"id"`
-	Login string       `json:"login"`
-	Email string       `json:"email"`
-	Name  NameResponse `json:"name"`
+	ID     uint64       `json:"id"`
+	Login  string       `json:"login"`
+	Email  string       `json:"email"`
+	Name   NameResponse `json:"name"`
+	Wallet Wallet       `json:"wallet"`
 }
 
 type InternalUserInfo struct {
 	ID           int    `json:"user_id"`
 	Login        string `json:"username"`
+	Email        string `json:"email"`
 	PasswordHash string `json:"password_hash"`
 }
 
@@ -79,7 +85,7 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, UserResponse{
-		ID:    createUser.ID,
+		ID:    createUser.UserShort.ID,
 		Login: createUser.Login,
 		Email: createUser.Meta.Email,
 		Name: NameResponse{
@@ -93,7 +99,7 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 func (c *UserController) GetUser(ctx *gin.Context) {
 	userIDParam := ctx.Param("user_id")
 
-	userID, err := strconv.ParseInt(userIDParam, 10, 64)
+	userID, err := strconv.ParseUint(userIDParam, 10, 64)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -113,12 +119,15 @@ func (c *UserController) GetUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, UserResponse{
-		ID:    user.ID,
+		ID:    user.UserShort.ID,
 		Login: user.Login,
 		Email: user.Meta.Email,
 		Name: NameResponse{
 			First: user.Meta.Name.First,
 			Last:  user.Meta.Name.Last,
+		},
+		Wallet: Wallet{
+			Balance: user.Balance,
 		},
 	})
 }
@@ -139,8 +148,37 @@ func (c *UserController) InternalGetUserByLogin(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, InternalUserInfo{
-		ID:           int(user.ID),
+		ID:           int(user.UserShort.ID),
 		Login:        user.Login,
+		Email:        user.Meta.Email,
+		PasswordHash: user.PasswordHash,
+	})
+}
+
+func (c *UserController) InternalGetUserByID(ctx *gin.Context) {
+	userIDParam := ctx.Param("user_id")
+	userID, err := strconv.ParseUint(userIDParam, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := c.userService.InternalGetUserByID(ctx, userID)
+
+	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "no user found"})
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, InternalUserInfo{
+		ID:           int(user.UserShort.ID),
+		Login:        user.Login,
+		Email:        user.Meta.Email,
 		PasswordHash: user.PasswordHash,
 	})
 }
@@ -148,7 +186,7 @@ func (c *UserController) InternalGetUserByLogin(ctx *gin.Context) {
 func (c *UserController) DeleteUser(ctx *gin.Context) {
 	userIDParam := ctx.Param("user_id")
 
-	userID, err := strconv.ParseInt(userIDParam, 10, 64)
+	userID, err := strconv.ParseUint(userIDParam, 10, 64)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -168,7 +206,7 @@ func (c *UserController) DeleteUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, UserResponse{
-		ID:    user.ID,
+		ID:    user.UserShort.ID,
 		Login: user.Login,
 		Email: user.Meta.Email,
 		Name: NameResponse{
@@ -186,7 +224,7 @@ type UpdateUserArgs struct {
 
 func (c *UserController) UpdateUser(ctx *gin.Context) {
 	userIDParam := ctx.Param("user_id")
-	userID, err := strconv.ParseInt(userIDParam, 10, 64)
+	userID, err := strconv.ParseUint(userIDParam, 10, 64)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -221,7 +259,7 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, UserResponse{
-		ID:    updatedUser.ID,
+		ID:    updatedUser.UserShort.ID,
 		Login: updatedUser.Login,
 		Email: updatedUser.Meta.Email,
 		Name: NameResponse{

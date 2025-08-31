@@ -11,7 +11,8 @@ import (
 func GetUser(ctx context.Context) *entity.UserShort {
 	ginCtx, ok := ctx.(*gin.Context)
 	if !ok {
-		log.Fatal("not gin context")
+		log.Printf("not gin context")
+		return nil
 	}
 
 	value, exists := ginCtx.Get(middlewares.CurrentUserKey)

@@ -1,0 +1,16 @@
+orderapp:
+  server:
+    port: 8000
+  replicaCount: 1
+  db:
+    user: orderapp
+    password: qocnhfoiucjmwfoijwamxaos
+    name: orderapp
+  redpanda:
+    addresses:
+      - my-redpanda.default.svc.cluster.local:9093
+    new_orders_topic: new_orders
+    order_is_paid_topic: order_is_paid_topic
+    consumer_group: order-consumer-group
+
+# rpk topic create order_updates -p 3

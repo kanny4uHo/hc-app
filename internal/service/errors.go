@@ -3,6 +3,7 @@ package service
 import "fmt"
 
 var ErrUserNotFound = fmt.Errorf("user is not found")
+var ErrNotEnoughMoney = fmt.Errorf("not enough money")
 
 type InvalidArgumentError struct {
 	Field  string

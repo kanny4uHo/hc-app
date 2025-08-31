@@ -5,6 +5,7 @@ type Config struct {
 		Host     string `yaml:"host"`
 		Port     int    `yaml:"port"`
 		Username string `yaml:"username"`
+		Password string `yaml:"password"`
 		DBName   string `yaml:"db_name"`
 	} `yaml:"database"`
 	Server struct {
@@ -18,4 +19,22 @@ type Config struct {
 	AuthService struct {
 		URL string `yaml:"url"`
 	} `yaml:"auth_service"`
+
+	OrderService struct {
+		URL string `yaml:"url"`
+	} `yaml:"order_service"`
+
+	BillingService struct {
+		URL string `yaml:"url"`
+	} `yaml:"billing_service"`
+
+	RedpandaBroker struct {
+		Addresses               []string `yaml:"addresses"`
+		OrderUpdatesTopic       string   `yaml:"order_updates_topic"`
+		NewUsersTopic           string   `yaml:"new_users_topic"`
+		NewOrdersTopic          string   `yaml:"new_orders_topic"`
+		OrderIsPaidTopic        string   `yaml:"order_is_paid_topic"`
+		OrderPaymentFailedTopic string   `yaml:"order_payment_failed_topic"`
+		ConsumerGroup           string   `yaml:"consumer_group"`
+	} `yaml:"redpanda_broker"`
 }

@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"healthcheckProject/internal/api/middlewares"
-	"healthcheckProject/internal/repository/httpclient"
+	"github.com/segmentio/kafka-go"
+	"healthcheckProject/internal/gateway"
 	"log"
 	"net/http"
 	"os"
@@ -16,10 +16,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/yaml.v3"
+
+	"healthcheckProject/internal/api/middlewares"
 	"healthcheckProject/internal/config"
 	"healthcheckProject/internal/controller"
 	"healthcheckProject/internal/metrics"
 	"healthcheckProject/internal/repository"
+	"healthcheckProject/internal/repository/httpclient"
 	"healthcheckProject/internal/service"
 )
 
@@ -38,21 +41,14 @@ func main() {
 		log.Fatalf("failed to unmarshal config.yaml: %s", err)
 	}
 
-	pwdBytes, err := os.ReadFile("/etc/pgsecret/postgres-password")
-	if err != nil {
-		log.Fatal("failed to read postgres-password from /etc/pgsecret/postgres-password")
-	}
-
 	databaseString := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
 		appConfig.Database.Username,
-		pwdBytes,
+		appConfig.Database.Password,
 		appConfig.Database.Host,
 		appConfig.Database.Port,
 		appConfig.Database.DBName,
 	)
-
-	router := gin.Default()
 
 	db, err := sql.Open("postgres", databaseString)
 	if err != nil {
@@ -76,6 +72,7 @@ func main() {
 		Help: "The latency of http requests in seconds",
 	}, []string{"status", "path", "method"})
 
+	router := gin.Default()
 	router.Use(metrics.HttpMiddleware{
 		RequestMetrics: httpRequestMetric,
 		LatencyMetrics: httpRequestLatencyMetric,
@@ -86,8 +83,34 @@ func main() {
 		appConfig.AuthService.URL,
 		&http.Client{Timeout: time.Second},
 	)
-	authGate := repository.NewHttpAuthGate(authClient)
-	userService := service.NewUserService(newPgRepo, authGate)
+
+	kafkaWriter := &kafka.Writer{
+		Addr:         kafka.TCP(appConfig.RedpandaBroker.Addresses...),
+		Logger:       gateway.KafkaLogger{},
+		BatchSize:    1,
+		RequiredAcks: kafka.RequireOne,
+	}
+
+	defer kafkaWriter.Close()
+
+	kafkaGateway := gateway.NewKafkaEventGateway(
+		kafkaWriter,
+		appConfig.RedpandaBroker.NewOrdersTopic,
+		appConfig.RedpandaBroker.NewUsersTopic,
+		appConfig.RedpandaBroker.OrderIsPaidTopic,
+		appConfig.RedpandaBroker.OrderPaymentFailedTopic,
+	)
+
+	authGate := gateway.NewHttpAuthGate(authClient)
+
+	billingGate := gateway.NewHttpBillingGate(
+		httpclient.NewBillingClient(
+			appConfig.BillingService.URL,
+			&http.Client{Timeout: time.Second},
+		),
+	)
+
+	userService := service.NewUserService(newPgRepo, authGate, kafkaGateway, billingGate)
 
 	userController := controller.CreateUserController(userService)
 
@@ -95,6 +118,7 @@ func main() {
 	internalApiRouter := router.Group("/internal/api/v1")
 
 	internalApiRouter.GET("/user/by_login/:user_login", userController.InternalGetUserByLogin)
+	internalApiRouter.GET("/user/by_id/:user_id", userController.InternalGetUserByID)
 
 	apiRouter.POST("/user", userController.CreateUser)
 
@@ -120,14 +144,6 @@ func main() {
 }
 
 func healthHandler(ctx *gin.Context) {
-	if time.Since(started).Seconds() < 5 {
-		ctx.JSON(http.StatusServiceUnavailable, gin.H{
-			"message": "Service is unavailable",
-		})
-
-		return
-	}
-
 	ctx.JSON(http.StatusOK, HealthResponse{
 		Status: "OK",
 		Host:   os.Getenv("HOSTNAME"),

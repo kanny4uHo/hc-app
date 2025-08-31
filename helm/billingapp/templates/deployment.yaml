@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billingapp-deployment
+spec:
+  replicas: {{ .Values.billingapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: ryzhkov-billingapp
+  template:
+    metadata:
+      annotations:
+        nikita.ru/scrape_every_30s: "true"
+        prometheus.io/port: "{{ .Values.billingapp.server.port }}"
+      labels:
+        app: ryzhkov-billingapp
+    spec:
+      containers:
+        - name: billingapp
+          image: kappy4uno/billing_app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.billingapp.server.port }}
+          volumeMounts:
+            - mountPath: /etc/billingapp
+              name: billingappconfig
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.billingapp.server.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: billingappconfig
+          configMap:
+            name: billingapp-config

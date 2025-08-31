@@ -7,12 +7,13 @@ type AddUserArgs struct {
 }
 
 type UserShort struct {
-	ID    int64
+	ID    uint64
 	Login string
 }
 
 type User struct {
 	UserShort
+	UserAccount
 	PasswordHash string
 	Meta         UserMeta
 }
@@ -28,5 +29,5 @@ type UserName struct {
 }
 
 func (user User) IsEmpty() bool {
-	return user.ID == 0
+	return user.UserShort.ID == 0
 }

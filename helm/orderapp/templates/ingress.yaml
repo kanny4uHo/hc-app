@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authorized-orderapp-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/auth-url: http://authapp-service.default.svc.cluster.local:8000/internal/api/v1/check
+    nginx.ingress.kubernetes.io/auth-response-headers: X-Login,X-User-Id
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - path: /otusapp/nryzhkov/(api/v1/order/.*$)
+            backend:
+              service:
+                name: orderapp-service
+                port:
+                  number: {{ .Values.orderapp.server.port }}
+            pathType: ImplementationSpecific
+          - path: /otusapp/nryzhkov/(api/v1/internal/order/.*$)
+            backend:
+              service:
+                name: orderapp-service
+                port:
+                  number: {{ .Values.orderapp.server.port }}
+            pathType: ImplementationSpecific
+

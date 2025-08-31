@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderapp-deployment
+spec:
+  replicas: {{ .Values.orderapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: ryzhkov-orderapp
+  template:
+    metadata:
+      annotations:
+        nikita.ru/scrape_every_30s: "true"
+        prometheus.io/port: "{{ .Values.orderapp.server.port }}"
+      labels:
+        app: ryzhkov-orderapp
+    spec:
+      containers:
+        - name: orderapp
+          image: kappy4uno/order_app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.orderapp.server.port }}
+          volumeMounts:
+            - mountPath: /etc/orderapp
+              name: orderappconfig
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.orderapp.server.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: orderappconfig
+          configMap:
+            name: orderapp-config

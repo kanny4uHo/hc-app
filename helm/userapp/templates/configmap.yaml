@@ -14,5 +14,10 @@ data:
       port: {{ .Values.userapp.server.port }}
     auth_service:
       url: {{ .Values.userapp.auth_service.url }}
+    billing_service:
+      url: {{ .Values.userapp.billing_service.url }}
+    redpanda_broker:
+      addresses: {{ .Values.userapp.redpanda.addresses}}
+      new_users_topic: {{ .Values.userapp.redpanda.new_users_topic }}
 
 

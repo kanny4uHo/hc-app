@@ -1,0 +1,21 @@
+billingapp:
+  server:
+    port: 8000
+  replicaCount: 1
+  db:
+    user: billingapp
+    password: adsklkfnasdjkfnwkjneqwnje
+    name: billingapp
+    host: pguser-postgresql-primary.default.svc.cluster.local
+    port: 5432
+  redpanda:
+    addresses:
+      - my-redpanda.default.svc.cluster.local:9093
+    new_users_topic: new_users
+    new_orders_topic: new_orders
+    order_is_paid_topic: order_is_paid_topic
+    order_payment_failed_topic: order_payment_failed_topic
+    consumer_group: billing-consumer-group
+  order_service:
+    url: http://orderapp-service.default.svc.cluster.local:8000
+

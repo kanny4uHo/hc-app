@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: billingapp-config
+data:
+  config.yaml: |
+    database:
+      username: {{ .Values.billingapp.db.user }}
+      password: {{ .Values.billingapp.db.password }}
+      host: {{ .Values.billingapp.db.host }}
+      port: {{ .Values.billingapp.db.port }}
+      db_name: {{ .Values.billingapp.db.name }}
+    server:
+      port: {{ .Values.billingapp.server.port }}
+    redpanda_broker:
+      addresses: {{ .Values.billingapp.redpanda.addresses }}
+      new_users_topic: {{ .Values.billingapp.redpanda.new_users_topic }}
+      new_orders_topic: {{ .Values.billingapp.redpanda.new_orders_topic }}
+      order_is_paid_topic: {{ .Values.billingapp.redpanda.order_is_paid_topic }}
+      order_payment_failed_topic: {{ .Values.billingapp.redpanda.order_payment_failed_topic }}
+      consumer_group: {{ .Values.billingapp.redpanda.consumer_group }}
+    order_service:
+      url: {{ .Values.billingapp.order_service.url }}
+
+

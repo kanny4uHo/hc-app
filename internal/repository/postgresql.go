@@ -48,7 +48,7 @@ func (p *PgUserRepository) WithinTransaction(ctx context.Context, f func(ctx con
 }
 
 func (p *PgUserRepository) AddUser(ctx context.Context, user entity.AddUserArgs, passwordHash string) (entity.User, error) {
-	var userID int64
+	var userID uint64
 
 	err := p.sql.QueryRowContext(
 		ctx,
@@ -67,7 +67,7 @@ func (p *PgUserRepository) AddUser(ctx context.Context, user entity.AddUserArgs,
 	return p.GetUserByID(ctx, userID)
 }
 
-func (p *PgUserRepository) GetUserByID(ctx context.Context, id int64) (entity.User, error) {
+func (p *PgUserRepository) GetUserByID(ctx context.Context, id uint64) (entity.User, error) {
 	return p.selectOneUserByQuery(ctx, selectByIDQuery, id)
 }
 
@@ -79,7 +79,7 @@ func (p *PgUserRepository) GetUserByEmail(ctx context.Context, email string) (en
 	return p.selectOneUserByQuery(ctx, selectByEmailQuery, email)
 }
 
-func (p *PgUserRepository) UpdateUser(ctx context.Context, id int64, args service.UpdateUserArgs) error {
+func (p *PgUserRepository) UpdateUser(ctx context.Context, id uint64, args service.UpdateUserArgs) error {
 	if args.LastName != "" {
 		_, err := p.sql.ExecContext(ctx, `UPDATE users set last_name = $1 where id = $2`, args.LastName, id)
 		if err != nil {
@@ -104,7 +104,7 @@ func (p *PgUserRepository) UpdateUser(ctx context.Context, id int64, args servic
 	return nil
 }
 
-func (p *PgUserRepository) DeleteUser(ctx context.Context, id int64) error {
+func (p *PgUserRepository) DeleteUser(ctx context.Context, id uint64) error {
 	_, err := p.sql.ExecContext(ctx, `DELETE FROM users WHERE id=$1`, id)
 	if err != nil {
 		return fmt.Errorf("failed to exec delete query: %w", err)
@@ -114,7 +114,7 @@ func (p *PgUserRepository) DeleteUser(ctx context.Context, id int64) error {
 }
 
 func (p *PgUserRepository) selectOneUserByQuery(ctx context.Context, query string, args ...any) (entity.User, error) {
-	var id int64
+	var id uint64
 	var login string
 	var email string
 	var passwordHashFromDB string

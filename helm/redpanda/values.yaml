@@ -1,0 +1,9 @@
+tls:
+  enabled: false
+
+statefulset:
+  replicas: 1
+
+external:
+  addresses:
+    - 127.0.0.1

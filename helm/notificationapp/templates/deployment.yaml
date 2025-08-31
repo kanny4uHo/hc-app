@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notificationapp-deployment
+spec:
+  replicas: {{ .Values.notificationapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: ryzhkov-notificationapp
+  template:
+    metadata:
+      labels:
+        app: ryzhkov-notificationapp
+    spec:
+      containers:
+        - name: notificationapp
+          image: kappy4uno/notification_app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.notificationapp.server.port }}
+          volumeMounts:
+            - mountPath: /etc/notificationapp
+              name: notificationappconfig
+              readOnly: true
+      volumes:
+        - name: notificationappconfig
+          configMap:
+            name: notificationapp-config

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificationapp-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.notificationapp.server.port }}
+      targetPort: {{ .Values.notificationapp.server.port }}
+      protocol: TCP
+  selector:
+    app: ryzhkov-notificationapp

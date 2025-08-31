@@ -23,6 +23,26 @@ func NewUserServiceRepo(userClient *httpclient.UserClient) *UserServiceRepo {
 	}
 }
 
+func (u *UserServiceRepo) GetUserByID(ctx context.Context, id uint64) (entity.UserCreds, error) {
+	info, err := u.userClient.GetUserInfoByID(ctx, id)
+	if err != nil {
+		log.Printf("failed to get user info %s\n", err)
+
+		if errors.Is(err, httpclient.ErrUserNotFound) {
+			return entity.UserCreds{}, service.ErrUserNotFound
+		}
+
+		return entity.UserCreds{}, fmt.Errorf("failed to get user info: %w", err)
+	}
+
+	return entity.UserCreds{
+		ID:           info.UserID,
+		Login:        info.Login,
+		Email:        info.Email,
+		PasswordHash: info.PasswordHash,
+	}, nil
+}
+
 func (u *UserServiceRepo) GetUserByLogin(ctx context.Context, login string) (entity.UserCreds, error) {
 	info, err := u.userClient.GetUserInfo(ctx, login)
 	if err != nil {
@@ -38,6 +58,7 @@ func (u *UserServiceRepo) GetUserByLogin(ctx context.Context, login string) (ent
 	return entity.UserCreds{
 		ID:           info.UserID,
 		Login:        info.Login,
+		Email:        info.Email,
 		PasswordHash: info.PasswordHash,
 	}, nil
 }

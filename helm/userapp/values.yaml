@@ -3,11 +3,17 @@ userapp:
   server:
     port: 8000
   db:
-    user: "postgres"
-    password: "userapp_password"
+    user: "userapp"
+    password: "asdajlshdfljasdlkjasbdf"
     name: "userapp"
   auth_service:
     url: http://authapp-service.default.svc.cluster.local:8000
+  billing_service:
+    url: http://billingapp-service.default.svc.cluster.local:8000
+  redpanda:
+    addresses:
+      - my-redpanda.default.svc.cluster.local:9093
+    new_users_topic: new_users
 
 authapp:
   replicaCount: 3

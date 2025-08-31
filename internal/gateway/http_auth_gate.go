@@ -1,8 +1,9 @@
-package repository
+package gateway
 
 import (
 	"context"
 	"fmt"
+
 	"healthcheckProject/internal/entity"
 	"healthcheckProject/internal/repository/httpclient"
 	"healthcheckProject/internal/service"
@@ -11,6 +12,8 @@ import (
 type HttpAuthGate struct {
 	authHttpClient *httpclient.AuthClient
 }
+
+var _ service.AuthGateway = (*HttpAuthGate)(nil)
 
 func NewHttpAuthGate(client *httpclient.AuthClient) *HttpAuthGate {
 	return &HttpAuthGate{
@@ -32,5 +35,3 @@ func (h *HttpAuthGate) RegisterUser(ctx context.Context, user entity.AddUserArgs
 		PasswordHash: registerResponse.PasswordHash,
 	}, nil
 }
-
-var _ service.AuthGateway = (*HttpAuthGate)(nil)

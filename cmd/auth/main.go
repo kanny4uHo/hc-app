@@ -1,7 +1,6 @@
 package main
 
 import (
-	"healthcheckProject/internal/repository/httpclient"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +16,7 @@ import (
 	"healthcheckProject/internal/controller"
 	"healthcheckProject/internal/metrics"
 	"healthcheckProject/internal/repository"
+	"healthcheckProject/internal/repository/httpclient"
 	"healthcheckProject/internal/service"
 )
 
@@ -58,7 +58,8 @@ func main() {
 		httpclient.NewUserClient(
 			appConfig.UserService.URL,
 			&http.Client{Timeout: time.Second},
-		))
+		),
+	)
 
 	authService := service.NewAuthService(credRepo, []byte(jwtTokenSecret))
 	authController := controller.NewAuthController(authService)
@@ -89,14 +90,6 @@ func main() {
 }
 
 func healthHandler(ctx *gin.Context) {
-	if time.Since(started).Seconds() < 5 {
-		ctx.JSON(http.StatusServiceUnavailable, gin.H{
-			"message": "Service is unavailable",
-		})
-
-		return
-	}
-
 	ctx.JSON(http.StatusOK, HealthResponse{
 		Status: "OK",
 		Host:   os.Getenv("HOSTNAME"),

@@ -1,0 +1,21 @@
+notificationapp:
+  server:
+    port: 8000
+  replicaCount: 1
+  db:
+    user: notificationapp
+    password: cqpmoiapvjmpaoinwejcanpwocfj
+    name: notificationapp
+    host: pguser-postgresql-primary.default.svc.cluster.local
+    port: 5432
+  redpanda:
+    addresses:
+      - my-redpanda.default.svc.cluster.local:9093
+    order_is_paid_topic: order_is_paid_topic
+    order_payment_failed_topic: order_payment_failed_topic
+    consumer_group: notification-consumer-group
+  order_service:
+    url: http://orderapp-service.default.svc.cluster.local:8000
+  user_service:
+    url: http://userapp-service.default.svc.cluster.local:8000
+
