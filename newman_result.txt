@@ -4,174 +4,314 @@ userapi tests order pay
 
 → create user 1
   POST http://arch.homework/otusapp/nryzhkov/api/v1/user  
-  201 Created ★ 47ms time ★ 425B↑ 278B↓ size ★ 9↑ 4↓ headers ★ 0 cookies
+  503 Service Temporarily Unavailable ★ 22ms time ★ 425B↑ 345B↓ size ★ 9↑ 4↓ headers ★ 0 cookies
   ┌ ↑ raw ★ 118B
-  │ {"login":"n04139Ddh5s","email":"0413983qVX@mail.ru","p
+  │ {"login":"n19398Eo9zV","email":"19398jC2Au@mail.ru","p
   │ assword":"12345678","first_name":"Nikita","last_name":
   │ "Ryzhkov"}
   └ 
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 125B
-  │ {"id":9,"login":"n04139Ddh5s","email":"0413983qVX@mail
-  │ .ru","name":{"first":"Nikita","last":"Ryzhkov"},"walle
-  │ t":{"balance":0}}
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait   dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  10ms      6ms    810µs        330µs           32ms             7ms        132µs     57ms  
+  10ms      6ms    3ms          494µs           5ms              5ms        114µs     32ms  
 
-  ✓  Response status code is 201
-  ✓  Response body contains user ID
-  ✓  Empty wallet
+  1. Response status code is 201
+  2. Response body contains user ID
+  3. Empty wallet
+  4⠄ JSONError in test-script
 
 → authorize user 1
   POST http://arch.homework/otusapp/nryzhkov/api/v1/login  
-  200 OK ★ 9ms time ★ 368B↑ 352B↓ size ★ 9↑ 4↓ headers ★ 0 cookies
-  ┌ ↑ raw ★ 61B
+  500 Internal Server Error ★ 34ms time ★ 357B↑ 427B↓ size ★ 9↑ 4↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 50B
   │ {
-  │     "username": "n04139Ddh5s",
+  │     "username": "",
   │     "password": "12345678"
   │ }
   └ 
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 204B
-  │ {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
-  │ eyJjcmVhdGVkIjoiMjAyNS0wOC0zMVQxMDo1MTo0NC4yNDAxNjYwNT
-  │ JaIiwibG9naW4iOiJuMDQxMzlEZGg1cyIsInVzZXJfaWQiOjl9.Vsn
-  │ CKtKR7PJe0Meypt2d9ZsyMAkCJCriu9Zfk6y8xFU"}
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 260B
+  │ {"error":"failed to get user by login: failed to get u
+  │ ser info: failed to get user info by http and login : 
+  │ Get \"http://userapp-service.default.svc.cluster.local
+  │ :8000/internal/api/v1/user/by_login/\": dial tcp 10.96
+  │ .193.123:8000: connect: connection refused"}
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  816µs     240µs   (cache)      (cache)         7ms              854µs      29µs      8ms   
+  882µs     251µs   (cache)      (cache)         32ms             1ms        36µs      34ms  
 
-  ✓  Response status code is 200
+  5. Response status code is 200
   ✓  Response body contains user ID
 
 → billing money/credit
   POST http://arch.homework/otusapp/nryzhkov/api/v1/billing/money/credit  
-  200 OK ★ 6ms time ★ 571B↑ 174B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
+  503 Service Temporarily Unavailable ★ 4ms time ★ 390B↑ 345B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
   ┌ ↑ raw ★ 40B
   │ {
-  │     "user_id": 9,
+  │     "user_id": 0,
   │     "amount": 1000
   │ }
   └ 
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 27B
-  │ {"user_id":9,"amount":1000}
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  548µs     115µs   (cache)      (cache)         4ms              600µs      19µs      5ms   
+  604µs     121µs   (cache)      (cache)         2ms              642µs      20µs      3ms   
 
-  ✓  Empty wallet
+  6. Empty wallet
 
 → create order
   POST http://arch.homework/otusapp/nryzhkov/api/v1/order/create  
-  201 Created ★ 6ms time ★ 566B↑ 208B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
+  503 Service Temporarily Unavailable ★ 2ms time ★ 385B↑ 345B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
   ┌ ↑ raw ★ 43B
   │ {
   │     "item": "pencil1",
   │     "price": 150
   │ }
   └ 
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 56B
-  │ {"id":5,"price":150,"status":"created","item":"pencil1
-  │ "}
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  557µs     121µs   (cache)      (cache)         4ms              667µs      23µs      6ms   
+  573µs     118µs   (cache)      (cache)         1ms              587µs      20µs      2ms   
 
-  ✓  Response status code is 201
+  7. Response status code is 201
 
 → get user 1
-  GET http://arch.homework/otusapp/nryzhkov/api/v1/user/9  
-  200 OK ★ 24ms time ★ 464B↑ 275B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 127B
-  │ {"id":9,"login":"n04139Ddh5s","email":"0413983qVX@mail
-  │ .ru","name":{"first":"Nikita","last":"Ryzhkov"},"walle
-  │ t":{"balance":850}}
+  GET http://arch.homework/otusapp/nryzhkov/api/v1/user/0  
+  503 Service Temporarily Unavailable ★ 6ms time ★ 283B↑ 345B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  3ms       532µs   (cache)      (cache)         19ms             3ms        74µs      27ms  
+  2ms       417µs   (cache)      (cache)         3ms              1ms        86µs      8ms   
 
-  ✓  Response status code is 200
-  ✓  Money are withdrawn
+  8. Response status code is 200
+  9. Money are withdrawn
 
 → notifications
   GET http://arch.homework/otusapp/nryzhkov/api/v1/notification/list  
-  200 OK ★ 10ms time ★ 475B↑ 290B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 142B
-  │ {"notifications":[{"ID":5,"Timestamp":"2025-08-31T10:5
-  │ 1:46.33595Z","Recipient":"0413983qVX@mail.ru","Message
-  │ ":"success payment for order 5"}]}
+  503 Service Temporarily Unavailable ★ 5ms time ★ 294B↑ 345B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  1ms       274µs   (cache)      (cache)         7ms              1ms        45µs      10ms  
+  1ms       273µs   (cache)      (cache)         2ms              1ms        45µs      5ms   
 
-  ✓  Money are withdrawn
+ 10. Money are withdrawn
 
 → create expensive order
   POST http://arch.homework/otusapp/nryzhkov/api/v1/order/create  
-  201 Created ★ 9ms time ★ 568B↑ 210B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
+  503 Service Temporarily Unavailable ★ 4ms time ★ 387B↑ 345B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
   ┌ ↑ raw ★ 45B
   │ {
   │     "item": "pencil1",
   │     "price": 10000
   │ }
   └ 
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 58B
-  │ {"id":6,"price":10000,"status":"created","item":"penci
-  │ l1"}
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  1ms       258µs   (cache)      (cache)         7ms              901µs      35µs      9ms   
+  858µs     193µs   (cache)      (cache)         1ms              864µs      30µs      3ms   
 
-  ✓  Response status code is 201
+ 11. Response status code is 201
 
 → get user 2
-  GET http://arch.homework/otusapp/nryzhkov/api/v1/user/9  
-  200 OK ★ 15ms time ★ 464B↑ 275B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 127B
-  │ {"id":9,"login":"n04139Ddh5s","email":"0413983qVX@mail
-  │ .ru","name":{"first":"Nikita","last":"Ryzhkov"},"walle
-  │ t":{"balance":850}}
+  GET http://arch.homework/otusapp/nryzhkov/api/v1/user/0  
+  503 Service Temporarily Unavailable ★ 6ms time ★ 283B↑ 345B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  1ms       404µs   (cache)      (cache)         12ms             1ms        44µs      15ms  
+  1ms       500µs   (cache)      (cache)         3ms              1ms        52µs      7ms   
 
-  ✓  Response status code is 200
-  ✓  Money are withdrawn
+ 12. Response status code is 200
+ 13. Money are withdrawn
 
 → notifications 2
   GET http://arch.homework/otusapp/nryzhkov/api/v1/notification/list  
-  200 OK ★ 7ms time ★ 475B↑ 415B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
-  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 267B
-  │ {"notifications":[{"ID":5,"Timestamp":"2025-08-31T10:5
-  │ 1:46.33595Z","Recipient":"0413983qVX@mail.ru","Message
-  │ ":"success payment for order 5"},{"ID":6,"Timestamp":"
-  │ 2025-08-31T10:51:49.414524Z","Recipient":"0413983qVX@m
-  │ ail.ru","Message":"not enough money for order 6"}]}
+  503 Service Temporarily Unavailable ★ 4ms time ★ 294B↑ 345B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ text/html ★ text ★ html ★ utf8 ★ 190B
+  │ <html>
+  │ <head><title>503 Service Temporarily Unavailable</titl
+  │ e></head>
+  │ <body>
+  │ <center><h1>503 Service Temporarily Unavailable</h1></
+  │ center>
+  │ <hr><center>nginx</center>
+  │ </body>
+  │ </html>
   └
   prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
-  1ms       176µs   (cache)      (cache)         5ms              684µs      23µs      7ms   
+  1ms       318µs   (cache)      (cache)         2ms              1ms        38µs      5ms   
 
-  ✓  Money are withdrawn
+ 14. Money are withdrawn
 
-┌─────────────────────────┬─────────────────────┬────────────────────┐
-│                         │            executed │             failed │
-├─────────────────────────┼─────────────────────┼────────────────────┤
-│              iterations │                   1 │                  0 │
-├─────────────────────────┼─────────────────────┼────────────────────┤
-│                requests │                   9 │                  0 │
-├─────────────────────────┼─────────────────────┼────────────────────┤
-│            test-scripts │                  18 │                  0 │
-├─────────────────────────┼─────────────────────┼────────────────────┤
-│      prerequest-scripts │                  11 │                  0 │
-├─────────────────────────┼─────────────────────┼────────────────────┤
-│              assertions │                  14 │                  0 │
-├─────────────────────────┴─────────────────────┴────────────────────┤
-│ total run duration: 6.3s                                           │
-├────────────────────────────────────────────────────────────────────┤
-│ total data received: 1.13kB (approx)                               │
-├────────────────────────────────────────────────────────────────────┤
-│ average response time: 14ms [min: 6ms, max: 47ms, s.d.: 12ms]      │
-├────────────────────────────────────────────────────────────────────┤
-│ average DNS lookup time: 810µs [min: 810µs, max: 810µs, s.d.: 0µs] │
-├────────────────────────────────────────────────────────────────────┤
-│ average first byte time: 11ms [min: 4ms, max: 32ms, s.d.: 8ms]     │
-└────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────┬──────────────────┬──────────────────┐
+│                         │         executed │           failed │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              iterations │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│                requests │                9 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│            test-scripts │               18 │                1 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│      prerequest-scripts │               11 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              assertions │               14 │               13 │
+├─────────────────────────┴──────────────────┴──────────────────┤
+│ total run duration: 6.2s                                      │
+├───────────────────────────────────────────────────────────────┤
+│ total data received: 1.78kB (approx)                          │
+├───────────────────────────────────────────────────────────────┤
+│ average response time: 9ms [min: 2ms, max: 34ms, s.d.: 10ms]  │
+├───────────────────────────────────────────────────────────────┤
+│ average DNS lookup time: 3ms [min: 3ms, max: 3ms, s.d.: 0µs]  │
+├───────────────────────────────────────────────────────────────┤
+│ average first byte time: 6ms [min: 1ms, max: 32ms, s.d.: 9ms] │
+└───────────────────────────────────────────────────────────────┘
+
+[31m   # [39m[31m failure        [39m[31m detail                                                [39m
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 01.  AssertionError  Response status code is 201                           
+                      expected response to have status code 201 but got 503 
+                      at assertion:0 in test-script                         
+                      inside "create user 1"                                
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 02.  JSONError       Response body contains user ID                        
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at assertion:1 in test-script                         
+                      inside "create user 1"                                
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 03.  JSONError       Empty wallet                                          
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at assertion:2 in test-script                         
+                      inside "create user 1"                                
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 04.  JSONError                                                             
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at test-script                                        
+                      inside "create user 1"                                
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 05.  AssertionError  Response status code is 200                           
+                      expected response to have status code 200 but got 500 
+                      at assertion:0 in test-script                         
+                      inside "authorize user 1"                             
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 06.  JSONError       Empty wallet                                          
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at assertion:0 in test-script                         
+                      inside "billing money/credit"                         
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 07.  AssertionError  Response status code is 201                           
+                      expected response to have status code 201 but got 503 
+                      at assertion:0 in test-script                         
+                      inside "create order"                                 
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 08.  AssertionError  Response status code is 200                           
+                      expected 503 to equal 200                             
+                      at assertion:0 in test-script                         
+                      inside "get user 1"                                   
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 09.  JSONError       Money are withdrawn                                   
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at assertion:1 in test-script                         
+                      inside "get user 1"                                   
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 10.  JSONError       Money are withdrawn                                   
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at assertion:0 in test-script                         
+                      inside "notifications"                                
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 11.  AssertionError  Response status code is 201                           
+                      expected response to have status code 201 but got 503 
+                      at assertion:0 in test-script                         
+                      inside "create expensive order"                       
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 12.  AssertionError  Response status code is 200                           
+                      expected 503 to equal 200                             
+                      at assertion:0 in test-script                         
+                      inside "get user 2"                                   
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 13.  JSONError       Money are withdrawn                                   
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at assertion:1 in test-script                         
+                      inside "get user 2"                                   
+[90m     [39m[90m                [39m[90m                                                       [39m
+ 14.  JSONError       Money are withdrawn                                   
+                      Unexpected token '<' at 1:1                           
+                      <html>                                                
+                      ^                                                     
+                      at assertion:0 in test-script                         
+                      inside "notifications 2"                              
