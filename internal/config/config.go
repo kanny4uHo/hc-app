@@ -30,7 +30,6 @@ type Config struct {
 
 	RedpandaBroker struct {
 		Addresses               []string `yaml:"addresses"`
-		OrderUpdatesTopic       string   `yaml:"order_updates_topic"`
 		NewUsersTopic           string   `yaml:"new_users_topic"`
 		NewOrdersTopic          string   `yaml:"new_orders_topic"`
 		OrderIsPaidTopic        string   `yaml:"order_is_paid_topic"`

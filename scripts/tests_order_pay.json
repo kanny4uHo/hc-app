@@ -1,0 +1,427 @@
+{
+	"info": {
+		"_postman_id": "3edf721e-dc23-46c5-9024-6b19730245b8",
+		"name": "userapi tests order pay",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "20216453"
+	},
+	"item": [
+		{
+			"name": "create user 1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set('accessToken', '');",
+							"",
+							"function generateRandomString(length) {",
+							"  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';",
+							"  let result = '';",
+							"  const charactersLength = characters.length;",
+							"  for (let i = 0; i < length; i++) {",
+							"    result += characters.charAt(Math.floor(Math.random() * charactersLength));",
+							"  }",
+							"  return result;",
+							"}",
+							"",
+							"let timestamp = Date.now().toString().substr(8);",
+							"",
+							"pm.request.body.update({",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"        \"login\": \"n\" + timestamp + generateRandomString(5),",
+							"        \"email\": timestamp + generateRandomString(5) + \"@mail.ru\",",
+							"        \"password\": \"12345678\",",
+							"        \"first_name\": \"Nikita\",",
+							"        \"last_name\": \"Ryzhkov\"",
+							"    }),",
+							"    options: {",
+							"        raw: {",
+							"            language: 'json'",
+							"        }",
+							"    }",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response body contains user ID\", function () {",
+							"    pm.expect(pm.response.json().id).to.not.be.null;",
+							"});",
+							"",
+							"pm.test(\"Empty wallet\", function () {",
+							"    pm.expect(pm.response.json().wallet.balance).to.equal(0);",
+							"});",
+							"",
+							"pm.collectionVariables.set('userID', pm.response.json().id);",
+							"pm.collectionVariables.set('userLogin', pm.response.json().login);",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"nikita2\",\n    \"password\": \"testpassword\",\n    \"email\": \"nikita.tester3@mail.ru\",\n    \"first_name\": \"Nikita\",\n    \"last_name\": \"Ryzhkov\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user"
+			},
+			"response": []
+		},
+		{
+			"name": "authorize user 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response body contains user ID\", function () {",
+							"    pm.expect(pm.response.json().access_token).to.not.be.null;",
+							"});",
+							"",
+							"pm.collectionVariables.set('accessToken', pm.response.json().access_token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{userLogin}}\",\n    \"password\": \"12345678\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/login"
+			},
+			"response": []
+		},
+		{
+			"name": "billing money/credit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Empty wallet\", function () {",
+							"    pm.expect(pm.response.json().amount).to.equal(1000);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_id\": {{userID}},\n    \"amount\": 1000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/billing/money/credit"
+			},
+			"response": []
+		},
+		{
+			"name": "create order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// Delay execution for 3 seconds",
+							"const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));",
+							"",
+							"async function executeWithDelay() {",
+							"    await delay(3000); // Wait for 3000 milliseconds (3 seconds)",
+							"}",
+							"",
+							"executeWithDelay();",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"item\": \"pencil1\",\n    \"price\": 150\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/order/create"
+			},
+			"response": []
+		},
+		{
+			"name": "get user 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Money are withdrawn\", function () {",
+							"    pm.expect(pm.response.json().wallet.balance).to.equal(850);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoiMjAyNS0wOC0wMVQxMTo1MTowMS44Mjc2MTg1NDRaIiwibG9naW4iOiJuMDcwNjJRT0dDcSIsInVzZXJfaWQiOjU0MDg4fQ.lKVoZlVMmj-ZVh0FLE63foBJx2ZsDw6Yuuk5daj7-TE",
+						"type": "text"
+					}
+				],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{userID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "notifications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Money are withdrawn\", function () {",
+							"    pm.expect(pm.response.json().notifications[0].Message).to.contain(\"success payment for order\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/notification/list"
+			},
+			"response": []
+		},
+		{
+			"name": "create expensive order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// Delay execution for 3 seconds",
+							"const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));",
+							"",
+							"async function executeWithDelay() {",
+							"    await delay(3000); // Wait for 3000 milliseconds (3 seconds)",
+							"}",
+							"",
+							"executeWithDelay();",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"item\": \"pencil1\",\n    \"price\": 10000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/order/create"
+			},
+			"response": []
+		},
+		{
+			"name": "get user 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Money are withdrawn\", function () {",
+							"    pm.expect(pm.response.json().wallet.balance).to.equal(850);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoiMjAyNS0wOC0wMVQxMTo1MTowMS44Mjc2MTg1NDRaIiwibG9naW4iOiJuMDcwNjJRT0dDcSIsInVzZXJfaWQiOjU0MDg4fQ.lKVoZlVMmj-ZVh0FLE63foBJx2ZsDw6Yuuk5daj7-TE",
+						"type": "text"
+					}
+				],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/user/{{userID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "notifications 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Money are withdrawn\", function () {",
+							"    pm.expect(pm.response.json().notifications[1].Message).to.contain(\"not enough money for order\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://{{baseUrl}}/otusapp/nryzhkov/api/v1/notification/list"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{accessToken}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework",
+			"type": "string"
+		},
+		{
+			"key": "userID",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "userLogin",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "prevUserID",
+			"value": "0",
+			"type": "default"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		}
+	]
+}

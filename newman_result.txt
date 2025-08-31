@@ -1,38 +1,177 @@
-➜  healthcheckProject git:(main) ✗ newman run scripts/userapi.postman_collection.json
-(node:88278) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
-(Use `node --trace-deprecation ...` to show where the warning was created)
 newman
 
-userapi
+userapi tests order pay
 
-→ create user
-  POST http://arch.homework/otusapp/nryzhkov/user [201 Created, 250B, 76ms]
+→ create user 1
+  POST http://arch.homework/otusapp/nryzhkov/api/v1/user  
+  201 Created ★ 47ms time ★ 425B↑ 278B↓ size ★ 9↑ 4↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 118B
+  │ {"login":"n04139Ddh5s","email":"0413983qVX@mail.ru","p
+  │ assword":"12345678","first_name":"Nikita","last_name":
+  │ "Ryzhkov"}
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 125B
+  │ {"id":9,"login":"n04139Ddh5s","email":"0413983qVX@mail
+  │ .ru","name":{"first":"Nikita","last":"Ryzhkov"},"walle
+  │ t":{"balance":0}}
+  └
+  prepare   wait   dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  10ms      6ms    810µs        330µs           32ms             7ms        132µs     57ms  
 
-→ update user
-  PUT http://arch.homework/otusapp/nryzhkov/user/5 [404 Not Found, 179B, 5ms]
+  ✓  Response status code is 201
+  ✓  Response body contains user ID
+  ✓  Empty wallet
 
-→ get user
-  GET http://arch.homework/otusapp/nryzhkov/user/5 [404 Not Found, 179B, 28ms]
+→ authorize user 1
+  POST http://arch.homework/otusapp/nryzhkov/api/v1/login  
+  200 OK ★ 9ms time ★ 368B↑ 352B↓ size ★ 9↑ 4↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 61B
+  │ {
+  │     "username": "n04139Ddh5s",
+  │     "password": "12345678"
+  │ }
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 204B
+  │ {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+  │ eyJjcmVhdGVkIjoiMjAyNS0wOC0zMVQxMDo1MTo0NC4yNDAxNjYwNT
+  │ JaIiwibG9naW4iOiJuMDQxMzlEZGg1cyIsInVzZXJfaWQiOjl9.Vsn
+  │ CKtKR7PJe0Meypt2d9ZsyMAkCJCriu9Zfk6y8xFU"}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  816µs     240µs   (cache)      (cache)         7ms              854µs      29µs      8ms   
 
-→ delete user
-  DELETE http://arch.homework/otusapp/nryzhkov/user/5 [404 Not Found, 179B, 4ms]
+  ✓  Response status code is 200
+  ✓  Response body contains user ID
 
-┌─────────────────────────┬──────────────────┬──────────────────┐
-│                         │         executed │           failed │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│              iterations │                1 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│                requests │                4 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│            test-scripts │                0 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│      prerequest-scripts │                0 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│              assertions │                0 │                0 │
-├─────────────────────────┴──────────────────┴──────────────────┤
-│ total run duration: 147ms                                     │
-├───────────────────────────────────────────────────────────────┤
-│ total data received: 173B (approx)                            │
-├───────────────────────────────────────────────────────────────┤
-│ average response time: 28ms [min: 4ms, max: 76ms, s.d.: 29ms] │
-└───────────────────────────────────────────────────────────────┘
+→ billing money/credit
+  POST http://arch.homework/otusapp/nryzhkov/api/v1/billing/money/credit  
+  200 OK ★ 6ms time ★ 571B↑ 174B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 40B
+  │ {
+  │     "user_id": 9,
+  │     "amount": 1000
+  │ }
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 27B
+  │ {"user_id":9,"amount":1000}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  548µs     115µs   (cache)      (cache)         4ms              600µs      19µs      5ms   
+
+  ✓  Empty wallet
+
+→ create order
+  POST http://arch.homework/otusapp/nryzhkov/api/v1/order/create  
+  201 Created ★ 6ms time ★ 566B↑ 208B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 43B
+  │ {
+  │     "item": "pencil1",
+  │     "price": 150
+  │ }
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 56B
+  │ {"id":5,"price":150,"status":"created","item":"pencil1
+  │ "}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  557µs     121µs   (cache)      (cache)         4ms              667µs      23µs      6ms   
+
+  ✓  Response status code is 201
+
+→ get user 1
+  GET http://arch.homework/otusapp/nryzhkov/api/v1/user/9  
+  200 OK ★ 24ms time ★ 464B↑ 275B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 127B
+  │ {"id":9,"login":"n04139Ddh5s","email":"0413983qVX@mail
+  │ .ru","name":{"first":"Nikita","last":"Ryzhkov"},"walle
+  │ t":{"balance":850}}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  3ms       532µs   (cache)      (cache)         19ms             3ms        74µs      27ms  
+
+  ✓  Response status code is 200
+  ✓  Money are withdrawn
+
+→ notifications
+  GET http://arch.homework/otusapp/nryzhkov/api/v1/notification/list  
+  200 OK ★ 10ms time ★ 475B↑ 290B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 142B
+  │ {"notifications":[{"ID":5,"Timestamp":"2025-08-31T10:5
+  │ 1:46.33595Z","Recipient":"0413983qVX@mail.ru","Message
+  │ ":"success payment for order 5"}]}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1ms       274µs   (cache)      (cache)         7ms              1ms        45µs      10ms  
+
+  ✓  Money are withdrawn
+
+→ create expensive order
+  POST http://arch.homework/otusapp/nryzhkov/api/v1/order/create  
+  201 Created ★ 9ms time ★ 568B↑ 210B↓ size ★ 10↑ 4↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 45B
+  │ {
+  │     "item": "pencil1",
+  │     "price": 10000
+  │ }
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 58B
+  │ {"id":6,"price":10000,"status":"created","item":"penci
+  │ l1"}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1ms       258µs   (cache)      (cache)         7ms              901µs      35µs      9ms   
+
+  ✓  Response status code is 201
+
+→ get user 2
+  GET http://arch.homework/otusapp/nryzhkov/api/v1/user/9  
+  200 OK ★ 15ms time ★ 464B↑ 275B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 127B
+  │ {"id":9,"login":"n04139Ddh5s","email":"0413983qVX@mail
+  │ .ru","name":{"first":"Nikita","last":"Ryzhkov"},"walle
+  │ t":{"balance":850}}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1ms       404µs   (cache)      (cache)         12ms             1ms        44µs      15ms  
+
+  ✓  Response status code is 200
+  ✓  Money are withdrawn
+
+→ notifications 2
+  GET http://arch.homework/otusapp/nryzhkov/api/v1/notification/list  
+  200 OK ★ 7ms time ★ 475B↑ 415B↓ size ★ 8↑ 4↓ headers ★ 0 cookies
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 267B
+  │ {"notifications":[{"ID":5,"Timestamp":"2025-08-31T10:5
+  │ 1:46.33595Z","Recipient":"0413983qVX@mail.ru","Message
+  │ ":"success payment for order 5"},{"ID":6,"Timestamp":"
+  │ 2025-08-31T10:51:49.414524Z","Recipient":"0413983qVX@m
+  │ ail.ru","Message":"not enough money for order 6"}]}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  1ms       176µs   (cache)      (cache)         5ms              684µs      23µs      7ms   
+
+  ✓  Money are withdrawn
+
+┌─────────────────────────┬─────────────────────┬────────────────────┐
+│                         │            executed │             failed │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              iterations │                   1 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│                requests │                   9 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│            test-scripts │                  18 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│      prerequest-scripts │                  11 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              assertions │                  14 │                  0 │
+├─────────────────────────┴─────────────────────┴────────────────────┤
+│ total run duration: 6.3s                                           │
+├────────────────────────────────────────────────────────────────────┤
+│ total data received: 1.13kB (approx)                               │
+├────────────────────────────────────────────────────────────────────┤
+│ average response time: 14ms [min: 6ms, max: 47ms, s.d.: 12ms]      │
+├────────────────────────────────────────────────────────────────────┤
+│ average DNS lookup time: 810µs [min: 810µs, max: 810µs, s.d.: 0µs] │
+├────────────────────────────────────────────────────────────────────┤
+│ average first byte time: 11ms [min: 4ms, max: 32ms, s.d.: 8ms]     │
+└────────────────────────────────────────────────────────────────────┘
