@@ -1,4 +1,4 @@
-VERSION ?= v0.0.7
+VERSION ?= v0.0.8
 TIMESTAMP := $(shell date +%s)
 DOCKER_BUILD_TAG := $(VERSION)-$(TIMESTAMP)
 
