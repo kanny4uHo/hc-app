@@ -20,11 +20,11 @@ func NewPgOrderRepo(db *sql.DB) *PgOrderRepo {
 	}
 }
 
-func (p *PgOrderRepo) CreateOrder(ctx context.Context, user entity.UserShort, price uint64, item string) (entity.Order, error) {
+func (p *PgOrderRepo) CreateOrder(ctx context.Context, user entity.UserShort, price uint64, item string, status entity.Status) (entity.Order, error) {
 	order := entity.Order{
 		Price:  price,
 		Item:   item,
-		Status: entity.StatusCreated,
+		Status: status,
 		Owner:  user,
 	}
 

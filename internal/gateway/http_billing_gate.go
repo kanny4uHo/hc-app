@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"fmt"
+
 	"healthcheckProject/internal/entity"
 	"healthcheckProject/internal/repository/httpclient"
 	"healthcheckProject/internal/service"
@@ -32,4 +33,22 @@ func (h *HttpBillingGate) GetUserAccountByID(ctx context.Context, id uint64) (en
 		UserID:  userAccount.UserID,
 		Balance: userAccount.Balance,
 	}, nil
+}
+
+func (h *HttpBillingGate) WithdrawMoney(ctx context.Context, userID uint64, amount uint64) error {
+	_, err := h.billingHttpClient.WithdrawMoney(ctx, userID, amount)
+	if err != nil {
+		return fmt.Errorf("failed to withdraw money by HTTP call: %w", err)
+	}
+
+	return nil
+}
+
+func (h *HttpBillingGate) CreditMoney(ctx context.Context, userID uint64, amount uint64) error {
+	_, err := h.billingHttpClient.CreditMoney(ctx, userID, amount)
+	if err != nil {
+		return fmt.Errorf("failed to credit money by HTTP call: %w", err)
+	}
+
+	return nil
 }

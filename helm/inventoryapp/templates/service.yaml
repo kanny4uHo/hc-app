@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventoryapp-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.inventoryapp.server.port }}
+      targetPort: {{ .Values.inventoryapp.server.port }}
+      protocol: TCP
+  selector:
+    app: ryzhkov-inventoryapp

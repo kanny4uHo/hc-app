@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deliveryapp-config
+data:
+  config.yaml: |
+    database:
+      username: {{ .Values.deliveryapp.db.user }}
+      password: {{ .Values.deliveryapp.db.password }}
+      host: {{ .Values.deliveryapp.db.host }}
+      port: {{ .Values.deliveryapp.db.port }}
+      db_name: {{ .Values.deliveryapp.db.name }}
+    server:
+      port: {{ .Values.deliveryapp.server.port }}
+
+

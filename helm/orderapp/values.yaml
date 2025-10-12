@@ -12,5 +12,11 @@ orderapp:
     new_orders_topic: new_orders
     order_is_paid_topic: order_is_paid_topic
     consumer_group: order-consumer-group
+  billing_service:
+    url: http://billingapp-service.default.svc.cluster.local:8000
+  inventory_service:
+    url: http://inventoryapp-service.default.svc.cluster.local:8000
+  delivery_service:
+    url: http://deliveryapp-service.default.svc.cluster.local:8000
 
 # rpk topic create order_updates -p 3

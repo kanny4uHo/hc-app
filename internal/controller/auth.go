@@ -43,7 +43,7 @@ type RegisterResponse struct {
 func (ac *AuthController) Register(ctx *gin.Context) {
 	var registerArgs RegisterArgs
 
-	err := ctx.ShouldBindJSON(&registerArgs)
+	err := ctx.BindJSON(&registerArgs)
 	if err != nil {
 		return
 	}
@@ -68,9 +68,8 @@ func (ac *AuthController) Login(ctx *gin.Context) {
 	log.Println("start")
 	var loginArgs LoginArgs
 
-	err := ctx.ShouldBindJSON(&loginArgs)
+	err := ctx.BindJSON(&loginArgs)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

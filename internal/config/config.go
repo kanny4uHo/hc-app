@@ -8,6 +8,7 @@ type Config struct {
 		Password string `yaml:"password"`
 		DBName   string `yaml:"db_name"`
 	} `yaml:"database"`
+
 	Server struct {
 		Port int `yaml:"port"`
 	} `yaml:"server"`
@@ -27,6 +28,14 @@ type Config struct {
 	BillingService struct {
 		URL string `yaml:"url"`
 	} `yaml:"billing_service"`
+
+	InventoryService struct {
+		URL string `yaml:"url"`
+	} `yaml:"inventory_service"`
+
+	DeliveryService struct {
+		URL string `yaml:"url"`
+	} `yaml:"delivery_service"`
 
 	RedpandaBroker struct {
 		Addresses               []string `yaml:"addresses"`

@@ -17,5 +17,11 @@ data:
       new_orders_topic: {{ .Values.orderapp.redpanda.new_orders_topic }}
       order_is_paid_topic: {{ .Values.orderapp.redpanda.order_is_paid_topic }}
       consumer_group: {{ .Values.orderapp.redpanda.consumer_group }}
+    billing_service:
+      url: {{ .Values.orderapp.billing_service.url }}
+    inventory_service:
+      url: {{ .Values.orderapp.inventory_service.url }}
+    delivery_service:
+      url: {{ .Values.orderapp.delivery_service.url }}
 
 

@@ -92,6 +92,8 @@ func (c *Controller) CreditMoney(ctx *gin.Context) {
 	err := ctx.BindJSON(request)
 	if err != nil {
 		log.Printf("failed to unmarshal request: %s", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
 		return
 	}
 
@@ -117,7 +119,7 @@ type WithdrawMoneyRequest struct {
 
 type WithdrawMoneyResponse struct {
 	UserID  uint64 `json:"user_id"`
-	Balance int64  `json:"amount"`
+	Balance int64  `json:"balance"`
 }
 
 func (c *Controller) WithdrawMoney(ctx *gin.Context) {

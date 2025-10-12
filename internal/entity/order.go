@@ -19,4 +19,7 @@ type Order struct {
 	Item   string
 	Status Status
 	Owner  UserShort
+
+	ReservationID uint64
+	DeliveryID    uint64
 }

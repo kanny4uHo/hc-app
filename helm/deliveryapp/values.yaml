@@ -1,0 +1,11 @@
+deliveryapp:
+  server:
+    port: 8000
+  replicaCount: 1
+  db:
+    user: deliveryapp
+    password: qpwoeinmnzkjasdlaksdjmxwp
+    name: deliveryapp
+    host: pguser-postgresql-primary.default.svc.cluster.local
+    port: 5432
+

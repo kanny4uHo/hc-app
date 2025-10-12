@@ -1,0 +1,11 @@
+inventoryapp:
+  server:
+    port: 8000
+  replicaCount: 1
+  db:
+    user: inventoryapp
+    password: laksjdlkdsjafhlkasdjlhasd
+    name: inventoryapp
+    host: pguser-postgresql-primary.default.svc.cluster.local
+    port: 5432
+

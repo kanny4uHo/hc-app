@@ -55,9 +55,8 @@ type InternalUserInfo struct {
 func (c *UserController) CreateUser(ctx *gin.Context) {
 	var createUserArgs CreateUserArgs
 
-	err := ctx.ShouldBindJSON(&createUserArgs)
+	err := ctx.BindJSON(&createUserArgs)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -232,9 +231,8 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 	}
 
 	updateArgs := UpdateUserArgs{}
-	err = ctx.ShouldBindJSON(&updateArgs)
+	err = ctx.BindJSON(&updateArgs)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

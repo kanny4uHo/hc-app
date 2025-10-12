@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deliveryapp-deployment
+spec:
+  replicas: {{ .Values.deliveryapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: ryzhkov-deliveryapp
+  template:
+    metadata:
+      annotations:
+        nikita.ru/scrape_every_30s: "true"
+        prometheus.io/port: "{{ .Values.deliveryapp.server.port }}"
+      labels:
+        app: ryzhkov-deliveryapp
+    spec:
+      containers:
+        - name: deliveryapp
+          image: kappy4uno/delivery_app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.deliveryapp.server.port }}
+          volumeMounts:
+            - mountPath: /etc/deliveryapp
+              name: deliveryappconfig
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.deliveryapp.server.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: deliveryappconfig
+          configMap:
+            name: deliveryapp-config

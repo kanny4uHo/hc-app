@@ -10,3 +10,13 @@ metrics:
     annotations:
       nikita.ru/scrape_every_30s: "true"
       prometheus.io/port: "9187"
+  image:
+    repository: "bitnamilegacy/postgres-exporter"
+image:
+  repository: "bitnamilegacy/postgresql"
+
+volumePermissions:
+  image:
+    repository: "bitnamilegacy/os-shell"
+
+

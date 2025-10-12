@@ -4,6 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"healthcheckProject/internal/repository/httpclient"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus"
@@ -11,16 +17,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/segmentio/kafka-go"
 	"gopkg.in/yaml.v3"
-	"healthcheckProject/internal/api/middlewares"
-	"healthcheckProject/internal/gateway"
-	"healthcheckProject/internal/repository/order"
-	"log"
-	"net/http"
-	"os"
 
+	"healthcheckProject/internal/api/middlewares"
 	"healthcheckProject/internal/config"
 	"healthcheckProject/internal/controller"
+	"healthcheckProject/internal/gateway"
 	"healthcheckProject/internal/metrics"
+	"healthcheckProject/internal/repository/order"
 	"healthcheckProject/internal/service"
 )
 
@@ -101,6 +104,24 @@ func main() {
 				appConfig.RedpandaBroker.NewUsersTopic,
 				appConfig.RedpandaBroker.OrderIsPaidTopic,
 				appConfig.RedpandaBroker.OrderPaymentFailedTopic,
+			),
+			gateway.NewHttpBillingGate(
+				httpclient.NewBillingClient(
+					appConfig.BillingService.URL,
+					&http.Client{Timeout: time.Second},
+				),
+			),
+			gateway.NewHttpInventoryGate(
+				httpclient.NewInventoryClient(
+					appConfig.InventoryService.URL,
+					&http.Client{Timeout: time.Second},
+				),
+			),
+			gateway.NewHttpDeliveryGate(
+				httpclient.NewDeliveryClient(
+					appConfig.DeliveryService.URL,
+					&http.Client{Timeout: time.Second},
+				),
 			),
 		),
 	)

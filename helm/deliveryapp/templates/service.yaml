@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: deliveryapp-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.deliveryapp.server.port }}
+      targetPort: {{ .Values.deliveryapp.server.port }}
+      protocol: TCP
+  selector:
+    app: ryzhkov-deliveryapp

@@ -6,3 +6,5 @@
 /cmd/order/order_app
 /cmd/billing/billing_app
 /cmd/notification/notification_app
+/cmd/inventory/inventory_app
+/cmd/delivery/delivery_app

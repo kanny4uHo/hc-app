@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventoryapp-deployment
+spec:
+  replicas: {{ .Values.inventoryapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: ryzhkov-inventoryapp
+  template:
+    metadata:
+      annotations:
+        nikita.ru/scrape_every_30s: "true"
+        prometheus.io/port: "{{ .Values.inventoryapp.server.port }}"
+      labels:
+        app: ryzhkov-inventoryapp
+    spec:
+      containers:
+        - name: inventoryapp
+          image: kappy4uno/inventory_app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.inventoryapp.server.port }}
+          volumeMounts:
+            - mountPath: /etc/inventoryapp
+              name: inventoryappconfig
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.inventoryapp.server.port }}
+              path: /health
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: inventoryappconfig
+          configMap:
+            name: inventoryapp-config

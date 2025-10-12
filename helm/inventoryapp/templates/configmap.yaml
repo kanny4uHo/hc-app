@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventoryapp-config
+data:
+  config.yaml: |
+    database:
+      username: {{ .Values.inventoryapp.db.user }}
+      password: {{ .Values.inventoryapp.db.password }}
+      host: {{ .Values.inventoryapp.db.host }}
+      port: {{ .Values.inventoryapp.db.port }}
+      db_name: {{ .Values.inventoryapp.db.name }}
+    server:
+      port: {{ .Values.inventoryapp.server.port }}
+
+

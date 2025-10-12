@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/segmentio/kafka-go"
-	"healthcheckProject/internal/gateway"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/segmentio/kafka-go"
 
 	"healthcheckProject/internal/entity"
+	"healthcheckProject/internal/gateway"
 	"healthcheckProject/internal/service"
 )
 
@@ -23,8 +23,9 @@ type OrderController struct {
 }
 
 type CreateOrderArgs struct {
-	Item  string `json:"item"`
-	Price uint64 `json:"price"`
+	Item   string `json:"item"`
+	Price  uint64 `json:"price"`
+	Amount uint64 `json:"amount"`
 }
 
 type CreateOrderResponse struct {
@@ -32,6 +33,9 @@ type CreateOrderResponse struct {
 	Price  uint64 `json:"price"`
 	Status string `json:"status"`
 	Item   string `json:"item"`
+
+	ReservationID uint64 `json:"reservation_id"`
+	DeliveryID    uint64 `json:"delivery_id"`
 }
 
 func NewOrderController(service *service.OrderService) *OrderController {
@@ -47,7 +51,12 @@ func (c *OrderController) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	createdOrder, err := c.service.CreateOrder(ctx, entity.CreateOrderArgs{
+	//createdOrder, err := c.service.CreateOrder(ctx, entity.CreateOrderArgs{
+	//	Item:  createOrderArgs.Item,
+	//	Price: createOrderArgs.Price,
+	//})
+
+	createdOrder, err := c.service.CreateOrderSaga(ctx, entity.CreateOrderArgs{
 		Item:  createOrderArgs.Item,
 		Price: createOrderArgs.Price,
 	})
@@ -63,6 +72,9 @@ func (c *OrderController) CreateOrder(ctx *gin.Context) {
 		Price:  createdOrder.Price,
 		Item:   createdOrder.Item,
 		Status: string(createdOrder.Status),
+
+		ReservationID: createdOrder.ReservationID,
+		DeliveryID:    createdOrder.DeliveryID,
 	})
 }
 
